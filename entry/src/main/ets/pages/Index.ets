@@ -63,7 +63,7 @@ struct Index {
         timeout: 1000,
         transition: (proxy: TabContentTransitionProxy) => {
           this.getUIContext().animateTo({
-            duration: 0,
+            duration: 200,
             onFinish: () => {
               proxy.finishTransition();
             }
