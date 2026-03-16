@@ -55,6 +55,24 @@ struct Index {
   private  LibraryViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
   private  MyViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
 
+  // 设置页面切换动画，代替滑动跳转页面动画
+  private customContentTransition: (from: number, to: number) => TabContentAnimatedTransition =
+    (from: number, to: number) => {
+      console.info(`from ${from} to ${to}`);
+      let tabContentAnimatedTransition = {
+        timeout: 1000,
+        transition: (proxy: TabContentTransitionProxy) => {
+          this.getUIContext().animateTo({
+            duration: 0,
+            onFinish: () => {
+              proxy.finishTransition();
+            }
+          }, () => {
+          });
+        }
+      } as TabContentAnimatedTransition;
+      return tabContentAnimatedTransition;
+    };
   /**
    /** tab栏构建器 */
   @Builder
@@ -217,6 +235,7 @@ struct Index {
       }
       return true;
     })
+    .customContentTransition(this.customContentTransition)
     .barHeight(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
       this.windowProperties.bottomRect + 48 : undefined)
     .barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : undefined)
@@ -310,22 +329,6 @@ struct Index {
             scrollEffectType: deviceInfo.distributionOSApiVersion >= 60100? ScrollEffectType.IMMERSIVE_GRADIENT_BLUR :ScrollEffectType.GRADIENT_BLUR,
             blurEffectiveStartOffset: LengthMetrics.vp(0),
             blurEffectiveEndOffset: LengthMetrics.vp(20)
-          },
-          originalStyle: {
-            backgroundStyle: {
-              backgroundColor: $r('sys.color.ohos_id_color_background'),
-            },
-            contentStyle: {
-              titleStyle: { mainTitleColor: $r('sys.color.font_primary'), subTitleColor: $r('sys.color.font_secondary') },
-              menuStyle: {
-                backgroundColor: $r('sys.color.comp_background_tertiary'),
-                iconColor: $r('sys.color.icon_primary')
-              },
-              backIconStyle: {
-                backgroundColor: $r('sys.color.comp_background_tertiary'),
-                iconColor: $r('sys.color.icon_primary')
-              }
-            }
           },
           blurStrategy:this.currentIndex!=2? 0:1,
           },
