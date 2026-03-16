@@ -1,0 +1,19 @@
+{
+  "routerMap": [
+    {
+      "name": "ContentCardDetail",
+      "pageSourceFile": "src/main/ets/pages/dialog/ContentCardDetail.ets",
+      "buildFunction": "ContentCardDetailBuilder"
+    },
+    {
+      "name": "PlaylistDetail",
+      "pageSourceFile": "src/main/ets/pages/PlaylistDetail.ets",
+      "buildFunction": "PlaylistDetailBuilder"
+    },
+    {
+      "name": "NowPlayingLandscape",
+      "pageSourceFile": "src/main/ets/pages/NowPlayingLandscape.ets",
+      "buildFunction": "NowPlayingLandscapeBuilder"
+    }
+  ]
+}

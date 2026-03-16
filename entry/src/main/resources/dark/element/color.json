@@ -1,0 +1,252 @@
+{
+  "color": [
+    {
+      "name": "primary_color",
+      "value": "#3399FF"
+    },
+    {
+      "name": "page_background",
+      "value": "#121212"
+    },
+    {
+      "name": "start_window_background",
+      "value": "#1E1E1E"
+    },
+    {
+      "name": "background_primary",
+      "value": "#121212"
+    },
+    {
+      "name": "background_white",
+      "value": "#1E1E1E"
+    },
+    {
+      "name": "background_gray_light",
+      "value": "#242424"
+    },
+    {
+      "name": "text_primary",
+      "value": "#E6FFFFFF"
+    },
+    {
+      "name": "accent",
+      "value": "#3399FF"
+    },
+    {
+      "name": "text_secondary",
+      "value": "#99FFFFFF"
+    },
+    {
+      "name": "shadow_light",
+      "value": "#00000060"
+    },
+    {
+      "name": "shadow_medium",
+      "value": "#00000080"
+    },
+    {
+      "name": "tab_selected",
+      "value": "#3399FF"
+    },
+    {
+      "name": "tab_normal",
+      "value": "#99FFFFFF"
+    },
+    {
+      "name": "tab_bar_background",
+      "value": "#1A1C1E"
+    },
+    {
+      "name": "card_content_overlay",
+      "value": "#60000000"
+    },
+    {
+      "name": "label_text_color",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "label_icon_color",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "divider",
+      "value": "#33FFFFFF"
+    },
+    {
+      "name": "item_pressed",
+      "value": "#33FFFFFF"
+    },
+    {
+      "name": "background_card",
+      "value": "#242424"
+    },
+    {
+      "name": "text_tertiary",
+      "value": "#66A0AEC0"
+    },
+    {
+      "name": "text_disabled",
+      "value": "#40A0AEC0"
+    },
+    {
+      "name": "background_secondary",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "error",
+      "value": "#FF5252"
+    },
+    {
+      "name": "success",
+      "value": "#66BB6A"
+    },
+    {
+      "name": "button_primary",
+      "value": "#3A3F42"
+    },
+    {
+      "name": "button_label_primary",
+      "value": "#74A1FF"
+    },
+    {
+      "name": "playlist_background_overlay",
+      "value": "#B3000000"
+    },
+    {
+      "name": "playlist_card_background",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "playlist_action_bar_background",
+      "value": "#1E1E1E"
+    },
+    {
+      "name": "playlist_gradient_start",
+      "value": "#00000000"
+    },
+    {
+      "name": "playlist_gradient_end",
+      "value": "#E6000000"
+    },
+    {
+      "name": "playlist_text_on_image",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "playlist_text_secondary_on_image",
+      "value": "#CCFFFFFF"
+    },
+    {
+      "name": "playlist_blur_background",
+      "value": "#121212"
+    },
+    {
+      "name": "playlist_divider",
+      "value": "#333333"
+    },
+    {
+      "name": "playlist_loading_background",
+      "value": "#242424"
+    },
+    {
+      "name": "button_retry_background",
+      "value": "#FF5252"
+    },
+    {
+      "name": "button_retry_text",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "button_play_primary",
+      "value": "#4ECDC4"
+    },
+    {
+      "name": "button_play_secondary",
+      "value": "#45B7B8"
+    },
+    {
+      "name": "cover_shadow",
+      "value": "#80000000"
+    },
+    {
+      "name": "cover_shadow_strong",
+      "value": "#B3000000"
+    },
+    {
+      "name": "search_box_background",
+      "value": "#2C2C2E"
+    },
+    {
+      "name": "search_box_border",
+      "value": "#3A3A3C"
+    },
+    {
+      "name": "search_icon_normal",
+      "value": "#99FFFFFF"
+    },
+    {
+      "name": "search_icon_active",
+      "value": "#3399FF"
+    },
+    {
+      "name": "library_card_gradient_start",
+      "value": "#00000000"
+    },
+    {
+      "name": "library_card_gradient_end",
+      "value": "#B3000000"
+    },
+    {
+      "name": "library_card_shadow",
+      "value": "#66000000"
+    },
+    {
+      "name": "library_source_selector_background",
+      "value": "#3A3F42"
+    },
+    {
+      "name": "library_empty_icon",
+      "value": "#444444"
+    },
+    {
+      "name": "primary",
+      "value": "#3399FF"
+    },
+    {
+      "name": "progress_track",
+      "value": "#3A3A3C"
+    },
+    {
+      "name": "control_icon",
+      "value": "#CCFFFFFF"
+    },
+    {
+      "name": "surface",
+      "value": "#1E1E1E"
+    },
+    {
+      "name": "shadow",
+      "value": "#00000040"
+    },
+    {
+      "name": "button_secondary",
+      "value": "#3A3A3C"
+    },
+    {
+      "name": "playing_indicator_active",
+      "value": "#3399FF"
+    },
+    {
+      "name": "playing_indicator_inactive",
+      "value": "#3A3A3C"
+    },
+    {
+      "name": "dialog_text_secondary",
+      "value": "#AAAAAA"
+    },
+    {
+      "name": "dialog_text_primary",
+      "value": "#3399FF"
+    }
+  ]
+}

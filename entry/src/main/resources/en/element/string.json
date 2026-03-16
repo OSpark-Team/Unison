@@ -1,0 +1,1200 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "Unison Music"
+    },
+    {
+      "name": "toolbar_home_title",
+      "value": "Home"
+    },
+    {
+      "name": "toolbar_library_title",
+      "value": "Library"
+    },
+    {
+      "name": "toolbar_ai_title",
+      "value": "Unison+"
+    },
+    {
+      "name": "toolbar_my_title",
+      "value": "My"
+    },
+    {
+      "name": "menu_new_songs",
+      "value": "New Releases"
+    },
+    {
+      "name": "menu_recommended_playlists",
+      "value": "Recommended Playlists"
+    },
+    {
+      "name": "menu_recommended_artists",
+      "value": "Recommended Artists"
+    },
+    {
+      "name": "menu_top_charts",
+      "value": "Top Charts"
+    },
+    {
+      "name": "no_data_source_title",
+      "value": "No Data Source"
+    },
+    {
+      "name": "no_data_source_description",
+      "value": "Please add a music data source to get started, click here to begin."
+    },
+    {
+      "name": "add_first_data_source",
+      "value": "Add First Data Source"
+    },
+    {
+      "name": "add_data_source",
+      "value": "Add Data Source"
+    },
+    {
+      "name": "edit_data_source",
+      "value": "Edit Data Source"
+    },
+    {
+      "name": "delete_data_source_title",
+      "value": "Delete Data Source"
+    },
+    {
+      "name": "delete_data_source_message",
+      "value": "Are you sure you want to delete the data source \"%s\"? This action cannot be undone."
+    },
+    {
+      "name": "data_source_name",
+      "value": "Source Name"
+    },
+    {
+      "name": "data_source_name_placeholder",
+      "value": "Please enter the data source name"
+    },
+    {
+      "name": "data_source_url",
+      "value": "Source URL"
+    },
+    {
+      "name": "data_source_url_placeholder",
+      "value": "Please enter the source URL, e.g., https://example.com"
+    },
+    {
+      "name": "data_source_description",
+      "value": "Source Description"
+    },
+    {
+      "name": "data_source_description_placeholder",
+      "value": "Please enter a description (optional)"
+    },
+    {
+      "name": "credential_token",
+      "value": "Credentials"
+    },
+    {
+      "name": "credential_token_placeholder",
+      "value": "Please enter credentials (Cookie or JWT)"
+    },
+    {
+      "name": "qr_code_credential_title",
+      "value": "Scan for Credentials"
+    },
+    {
+      "name": "qr_code_credential_description",
+      "value": "You can also scan a QR code to quickly obtain credential information"
+    },
+    {
+      "name": "generate_qr_code",
+      "value": "Generate QR Code"
+    },
+    {
+      "name": "regenerate_qr_code",
+      "value": "Regenerate"
+    },
+    {
+      "name": "edit",
+      "value": "Edit"
+    },
+    {
+      "name": "delete",
+      "value": "Delete"
+    },
+    {
+      "name": "cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "save",
+      "value": "Save"
+    },
+    {
+      "name": "next",
+      "value": "Next"
+    },
+    {
+      "name": "back",
+      "value": "Back"
+    },
+    {
+      "name": "add_source_success",
+      "value": "Data source added successfully"
+    },
+    {
+      "name": "add_source_failed",
+      "value": "Failed to add data source: %s"
+    },
+    {
+      "name": "update_source_success",
+      "value": "Data source updated successfully"
+    },
+    {
+      "name": "update_source_failed",
+      "value": "Failed to update data source: %s"
+    },
+    {
+      "name": "delete_success",
+      "value": "Deleted successfully"
+    },
+    {
+      "name": "delete_failed",
+      "value": "Failed to delete: %s"
+    },
+    {
+      "name": "form_error_name_required",
+      "value": "Please enter a data source name"
+    },
+    {
+      "name": "form_error_url_required",
+      "value": "Please enter a data source URL"
+    },
+    {
+      "name": "form_error_url_invalid",
+      "value": "Please enter a valid URL"
+    },
+    {
+      "name": "form_error_token_required",
+      "value": "Please enter credentials or scan the QR code"
+    },
+    {
+      "name": "setting_group_general",
+      "value": "General Settings"
+    },
+    {
+      "name": "setting_group_playback",
+      "value": "Playback Settings"
+    },
+    {
+      "name": "setting_group_about",
+      "value": "About"
+    },
+    {
+      "name": "setting_theme",
+      "value": "Theme"
+    },
+    {
+      "name": "setting_theme_desc",
+      "value": "Select application theme"
+    },
+    {
+      "name": "setting_language",
+      "value": "Language"
+    },
+    {
+      "name": "setting_language_desc",
+      "value": "Select application language"
+    },
+    {
+      "name": "setting_cache",
+      "value": "Cache Management"
+    },
+    {
+      "name": "setting_cache_desc",
+      "value": "Clear application cache"
+    },
+    {
+      "name": "setting_audio_quality",
+      "value": "Audio Quality"
+    },
+    {
+      "name": "setting_audio_quality_desc",
+      "value": "Select playback quality"
+    },
+    {
+      "name": "setting_playback_network",
+      "value": "Playback Network"
+    },
+    {
+      "name": "setting_playback_network_wifi_only",
+      "value": "WLAN Only"
+    },
+    {
+      "name": "setting_playback_network_both",
+      "value": "WLAN and Cellular"
+    },
+    {
+      "name": "setting_playback_mode",
+      "value": "Playback Mode"
+    },
+    {
+      "name": "setting_playback_mode_desc",
+      "value": "Set playback mode"
+    },
+    {
+      "name": "setting_about_app",
+      "value": "About App"
+    },
+    {
+      "name": "setting_about_app_desc",
+      "value": "View application information"
+    },
+    {
+      "name": "setting_help",
+      "value": "Help"
+    },
+    {
+      "name": "setting_help_desc",
+      "value": "Get usage help"
+    },
+    {
+      "name": "setting_feedback",
+      "value": "Feedback"
+    },
+    {
+      "name": "setting_feedback_desc",
+      "value": "Submit suggestions and feedback"
+    },
+    {
+      "name": "sheet_title_feedback",
+      "value": "Feedback"
+    },
+    {
+      "name": "setting_feedback_sheet_desc",
+      "value": "Tell us about your experience, suggestions, or any issues you encountered."
+    },
+    {
+      "name": "setting_feedback_version_hint",
+      "value": "The current app version will be attached automatically when submitting."
+    },
+    {
+      "name": "setting_feedback_content_label",
+      "value": "Feedback"
+    },
+    {
+      "name": "setting_feedback_content_placeholder",
+      "value": "Describe your ideas, suggestions, or the issue you encountered"
+    },
+    {
+      "name": "setting_feedback_contact_label",
+      "value": "Contact for follow-up (optional)"
+    },
+    {
+      "name": "setting_feedback_contact_placeholder",
+      "value": "Email, QQ, Telegram, etc."
+    },
+    {
+      "name": "setting_feedback_submit",
+      "value": "Submit Feedback"
+    },
+    {
+      "name": "setting_feedback_submitting",
+      "value": "Submitting..."
+    },
+    {
+      "name": "setting_feedback_validation_error",
+      "value": "Please enter your feedback first"
+    },
+    {
+      "name": "setting_feedback_submit_success",
+      "value": "Feedback submitted successfully. Thank you!"
+    },
+    {
+      "name": "setting_feedback_submit_failed",
+      "value": "Failed to submit feedback. Please try again later."
+    },
+    {
+      "name": "loading",
+      "value": "Loading..."
+    },
+    {
+      "name": "error_occurred",
+      "value": "An error occurred"
+    },
+    {
+      "name": "retry",
+      "value": "Retry"
+    },
+    {
+      "name": "qr_status_expired",
+      "value": "QR code expired, please regenerate"
+    },
+    {
+      "name": "qr_status_waiting",
+      "value": "Waiting for scan..."
+    },
+    {
+      "name": "qr_status_confirm",
+      "value": "Please confirm login on the client"
+    },
+    {
+      "name": "qr_status_success",
+      "value": "Login successful"
+    },
+    {
+      "name": "qr_generating",
+      "value": "Generating QR code..."
+    },
+    {
+      "name": "qr_scan_prompt",
+      "value": "Please scan the QR code"
+    },
+    {
+      "name": "qr_generate_failed",
+      "value": "Failed to generate QR code"
+    },
+    {
+      "name": "qr_check_status_failed",
+      "value": "Failed to check status"
+    },
+    {
+      "name": "error_qr_generate_failed",
+      "value": "Failed to generate QR code: %s"
+    },
+    {
+      "name": "error_database_not_initialized",
+      "value": "Database not initialized"
+    },
+    {
+      "name": "error_load_sources_failed",
+      "value": "Failed to load source list: %s"
+    },
+    {
+      "name": "error_add_source_failed",
+      "value": "Failed to add source configuration: %s"
+    },
+    {
+      "name": "error_update_source_failed",
+      "value": "Failed to update source configuration: %s"
+    },
+    {
+      "name": "error_delete_source_failed",
+      "value": "Failed to delete source configuration: %s"
+    },
+    {
+      "name": "error_source_not_found",
+      "value": "Data source not found: %s"
+    },
+    {
+      "name": "error_refresh_sources_failed",
+      "value": "Failed to refresh source list: %s"
+    },
+    {
+      "name": "error_check_qr_status_failed",
+      "value": "Failed to check QR status: %s"
+    },
+    {
+      "name": "set_main",
+      "value": "Set as Main Source"
+    },
+    {
+      "name": "playlist_track_count",
+      "value": "%s songs"
+    },
+    {
+      "name": "add_next_song",
+      "value": "Play Next"
+    },
+    {
+      "name": "close",
+      "value": "Close"
+    },
+    {
+      "name": "playlist_detail_title",
+      "value": "Playlist Details"
+    },
+    {
+      "name": "play_all",
+      "value": "Play All"
+    },
+    {
+      "name": "play_all_with_count",
+      "value": "Play All (%d)"
+    },
+    {
+      "name": "song_count",
+      "value": "%d songs"
+    },
+    {
+      "name": "song_count_simple",
+      "value": "%d tracks"
+    },
+    {
+      "name": "playlist_created_by",
+      "value": "Created by: %s"
+    },
+    {
+      "name": "playlist_description_empty",
+      "value": "No description available"
+    },
+    {
+      "name": "playlist_loading",
+      "value": "Loading..."
+    },
+    {
+      "name": "playlist_load_failed",
+      "value": "Load failed"
+    },
+    {
+      "name": "playlist_empty",
+      "value": "Playlist is empty"
+    },
+    {
+      "name": "playlist_retry",
+      "value": "Retry"
+    },
+    {
+      "name": "add_to_playlist",
+      "value": "Add to Playlist"
+    },
+    {
+      "name": "download_song",
+      "value": "Download Song"
+    },
+    {
+      "name": "share_playlist",
+      "value": "Share Playlist"
+    },
+    {
+      "name": "collect_playlist",
+      "value": "Favorite Playlist"
+    },
+    {
+      "name": "playlist_info",
+      "value": "Playlist Info"
+    },
+    {
+      "name": "search_placeholder",
+      "value": "Search songs, artists, albums"
+    },
+    {
+      "name": "home_search_placeholder",
+      "value": "Search songs, artists, playlists, albums"
+    },
+    {
+      "name": "search_songs",
+      "value": "Search Songs"
+    },
+    {
+      "name": "search_clear",
+      "value": "Clear Search"
+    },
+    {
+      "name": "library_title",
+      "value": "Music Library"
+    },
+    {
+      "name": "library_search_placeholder",
+      "value": "Search Playlists"
+    },
+    {
+      "name": "library_source_switch",
+      "value": "Switch Data Source"
+    },
+    {
+      "name": "library_empty_title",
+      "value": "No Playlists"
+    },
+    {
+      "name": "library_empty_description",
+      "value": "You haven't created or favorited any playlists yet"
+    },
+    {
+      "name": "library_playlist_count",
+      "value": "%d playlists"
+    },
+    {
+      "name": "library_no_source_title",
+      "value": "No Source Selected"
+    },
+    {
+      "name": "library_no_source_description",
+      "value": "Please add and select a data source first"
+    },
+    {
+      "name": "library_loading",
+      "value": "Loading..."
+    },
+    {
+      "name": "approximately_datasync_reason",
+      "value": "Cross-device data synchronization"
+    },
+    {
+      "name": "unsupported_version",
+      "value": "Current version not supported"
+    },
+    {
+      "name": "approximately_background_running_reason",
+      "value": "Music playback"
+    },
+    {
+      "name": "empty_url",
+      "value": "Server did not return a playback URL"
+    },
+    {
+      "name": "wifi_only",
+      "value": "You are currently using cellular data. Continue playing?"
+    },
+    {
+      "name": "no_network",
+      "value": "No network connection available"
+    },
+    {
+      "name": "wifi_only_title",
+      "value": "Play using cellular data"
+    },
+    {
+      "name": "confirm",
+      "value": "Confirm"
+    },
+    {
+      "name": "not_playing",
+      "value": "Nothing playing"
+    },
+    {
+      "name": "unknown_song",
+      "value": "Unknown Song"
+    },
+    {
+      "name": "cancel_favorite",
+      "value": "Unfavorite"
+    },
+    {
+      "name": "favorite",
+      "value": "Favorite"
+    },
+    {
+      "name": "cancel_favorite_message",
+      "value": "Do you want to unfavorite the playlist %s?"
+    },
+    {
+      "name": "favorite_message",
+      "value": "Do you want to favorite the playlist %s?"
+    },
+    {
+      "name": "favorite_success",
+      "value": "Added to favorites"
+    },
+    {
+      "name": "cancel_favorite_success",
+      "value": "Removed from favorites"
+    },
+    {
+      "name": "now_playing_queue_title",
+      "value": "Current Play Queue"
+    },
+    {
+      "name": "now_playing_queue_empty",
+      "value": "Play queue is empty"
+    },
+    {
+      "name": "now_playing_lyrics_placeholder",
+      "value": "Fetching lyrics..."
+    },
+    {
+      "name": "now_playing_landscape_mode",
+      "value": "Landscape Mode"
+    },
+    {
+      "name": "sheet_title_theme",
+      "value": "Select Theme"
+    },
+    {
+      "name": "sheet_title_language",
+      "value": "Select Language"
+    },
+    {
+      "name": "sheet_title_bitrate",
+      "value": "Audio Quality Settings"
+    },
+    {
+      "name": "setting_theme_system",
+      "value": "Follow System"
+    },
+    {
+      "name": "setting_theme_light",
+      "value": "Light"
+    },
+    {
+      "name": "setting_theme_dark",
+      "value": "Dark"
+    },
+    {
+      "name": "setting_language_zh",
+      "value": "Simplified Chinese"
+    },
+    {
+      "name": "setting_language_en",
+      "value": "English"
+    },
+    {
+      "name": "setting_bitrate_standard",
+      "value": "Standard"
+    },
+    {
+      "name": "setting_bitrate_higher",
+      "value": "Higher"
+    },
+    {
+      "name": "setting_bitrate_exhigh",
+      "value": "Extreme"
+    },
+    {
+      "name": "setting_bitrate_lossless",
+      "value": "Lossless"
+    },
+    {
+      "name": "setting_bitrate_hires",
+      "value": "Hi-Res"
+    },
+    {
+      "name": "setting_bitrate_vivd",
+      "value": "Audio Vivid"
+    },
+    {
+      "name": "setting_playback_bitrate_data",
+      "value": "Cellular Playback Quality"
+    },
+    {
+      "name": "setting_playback_bitrate_wifi",
+      "value": "WLAN Playback Quality"
+    },
+    {
+      "name": "setting_playback_bitrate",
+      "value": "Playback Quality"
+    },
+    {
+      "name": "setting_download_bitrate",
+      "value": "Download Quality"
+    },
+    {
+      "name": "setting_group_experimental",
+      "value": "Experimental Features"
+    },
+    {
+      "name": "setting_experimental_desc",
+      "value": "These features are under development and may be unstable"
+    },
+    {
+      "name": "setting_experimental_audio_rhythm",
+      "value": "Audio Rhythm"
+    },
+    {
+      "name": "setting_experimental_audio_rhythm_desc",
+      "value": "Haptic feedback based on audio rhythm"
+    },
+    {
+      "name": "setting_experimental_audio_rhythm_hint",
+      "value": "Some devices do not have a vibration motor, so this feature may not work even when enabled."
+    },
+    {
+      "name": "setting_experimental_word_for_word_lyrics",
+      "value": "Word-by-word Lyrics"
+    },
+    {
+      "name": "setting_experimental_word_for_word_lyrics_desc",
+      "value": "Prefer word-by-word lyric rendering, which may increase lyric UI rendering load"
+    },
+    {
+      "name": "setting_experimental_playing_mix",
+      "value": "Concurrent Audio Playback"
+    },
+    {
+      "name": "setting_experimental_playing_mix_desc",
+      "value": "Allow playback together with other audio sources instead of taking exclusive audio output"
+    },
+    {
+      "name": "setting_experimental_placeholder",
+      "value": "Placeholder"
+    },
+    {
+      "name": "setting_group_unison_plus",
+      "value": "Unison+ Settings"
+    },
+    {
+      "name": "setting_byok_title",
+      "value": "BYOK"
+    },
+    {
+      "name": "setting_byok_desc",
+      "value": "Set your own API Key, API Base, and model name"
+    },
+    {
+      "name": "setting_byok_api_key",
+      "value": "API Key"
+    },
+    {
+      "name": "setting_byok_api_key_placeholder",
+      "value": "Please enter API Key"
+    },
+    {
+      "name": "setting_byok_api_base",
+      "value": "API Base"
+    },
+    {
+      "name": "setting_byok_api_base_placeholder",
+      "value": "Please enter API Base (OpenAI compatible)"
+    },
+    {
+      "name": "setting_byok_api_model",
+      "value": "Model Name"
+    },
+    {
+      "name": "setting_byok_api_model_placeholder",
+      "value": "Please enter a model name, for example gpt-4o-mini"
+    },
+    {
+      "name": "unison_plus_title",
+      "value": "Unison+"
+    },
+    {
+      "name": "unison_plus_subtitle",
+      "value": "Use your own OpenAI-compatible API to search music, inspect sources, and switch the default source."
+    },
+    {
+      "name": "unison_plus_empty_title",
+      "value": "Start a conversation"
+    },
+    {
+      "name": "unison_plus_empty_desc",
+      "value": "For example: Set a certain data source as the default, or help me search for songs by Jay Chou."
+    },
+    {
+      "name": "unison_plus_input_placeholder",
+      "value": "Tell Unison+ what you want it to do"
+    },
+    {
+      "name": "unison_plus_send",
+      "value": "Send"
+    },
+    {
+      "name": "unison_plus_sending",
+      "value": "Processing..."
+    },
+    {
+      "name": "unison_plus_missing_config",
+      "value": "BYOK is not configured"
+    },
+    {
+      "name": "unison_plus_config_hint",
+      "value": "Go to My > Settings > Unison+ Settings and fill in API Key, API Base, and model name first."
+    },
+    {
+      "name": "unison_plus_status",
+      "value": "Processing"
+    },
+    {
+      "name": "unison_plus_thinking",
+      "value": "Thinking"
+    },
+    {
+      "name": "unison_plus_searching",
+      "value": "Searching"
+    },
+    {
+      "name": "unison_plus_calling_tool",
+      "value": "Calling tool"
+    },
+    {
+      "name": "unison_plus_fetching_lyric",
+      "value": "Fetching lyrics"
+    },
+    {
+      "name": "unison_plus_playing_song",
+      "value": "Now playing"
+    },
+    {
+      "name": "unison_plus_source_switched",
+      "value": "Default source"
+    },
+    {
+      "name": "unison_plus_results",
+      "value": "Results"
+    },
+    {
+      "name": "unison_plus_songs",
+      "value": "Songs"
+    },
+    {
+      "name": "unison_plus_playlists",
+      "value": "Playlists"
+    },
+    {
+      "name": "unison_plus_artists",
+      "value": "Artists"
+    },
+    {
+      "name": "unison_plus_albums",
+      "value": "Albums"
+    },
+    {
+      "name": "unison_plus_sources",
+      "value": "Sources"
+    },
+    {
+      "name": "unison_plus_lyrics",
+      "value": "Lyrics"
+    },
+    {
+      "name": "unison_plus_no_lyric",
+      "value": "No lyric content"
+    },
+    {
+      "name": "unison_plus_translation",
+      "value": "Translation"
+    },
+    {
+      "name": "unison_plus_transliteration",
+      "value": "Transliteration"
+    },
+    {
+      "name": "unison_plus_round_limit",
+      "value": "Tool call rounds exceeded the limit. Please narrow the request and try again."
+    },
+    {
+      "name": "unison_plus_no_model_result",
+      "value": "The model did not return any usable result"
+    },
+    {
+      "name": "unison_plus_empty_structured_response",
+      "value": "The structured response is empty"
+    },
+    {
+      "name": "unison_plus_no_display_content",
+      "value": "Finished processing, but the model did not return any displayable content."
+    },
+    {
+      "name": "unison_plus_song_count_suffix",
+      "value": "songs"
+    },
+    {
+      "name": "unison_plus_tool_running",
+      "value": "Running"
+    },
+    {
+      "name": "unison_plus_tool_done",
+      "value": "Done"
+    },
+    {
+      "name": "unison_plus_tool_failed",
+      "value": "Failed"
+    },
+    {
+      "name": "unison_plus_request_failed",
+      "value": "Request failed"
+    },
+    {
+      "name": "unison_plus_tool_timeline",
+      "value": "Tool timeline"
+    },
+    {
+      "name": "unison_plus_tool_list_sources",
+      "value": "List sources"
+    },
+    {
+      "name": "unison_plus_tool_set_main_source",
+      "value": "Set default source"
+    },
+    {
+      "name": "unison_plus_tool_get_user_playlists",
+      "value": "Get user playlists"
+    },
+    {
+      "name": "unison_plus_tool_get_song_lyric",
+      "value": "Get song lyrics"
+    },
+    {
+      "name": "unison_plus_tool_search_music",
+      "value": "Search music"
+    },
+    {
+      "name": "unison_plus_switched_to",
+      "value": "Switched to"
+    },
+    {
+      "name": "unison_plus_tool_returned_prefix",
+      "value": "Returned "
+    },
+    {
+      "name": "unison_plus_tool_sources_count_suffix",
+      "value": " sources"
+    },
+    {
+      "name": "unison_plus_tool_playlists_count_suffix",
+      "value": " playlists"
+    },
+    {
+      "name": "unison_plus_tool_set_main_source_prefix",
+      "value": "Set "
+    },
+    {
+      "name": "unison_plus_tool_set_main_source_suffix",
+      "value": " as default source"
+    },
+    {
+      "name": "unison_plus_tool_no_source_available",
+      "value": "No source is currently available"
+    },
+    {
+      "name": "unison_plus_tool_missing_uid",
+      "value": "The current source has no available uid. Please sign in first or pass uid explicitly"
+    },
+    {
+      "name": "unison_plus_tool_missing_song_id",
+      "value": "get_song_lyric is missing the required parameter id"
+    },
+    {
+      "name": "unison_plus_tool_lyric_returned",
+      "value": "Returned song lyrics"
+    },
+    {
+      "name": "unison_plus_tool_missing_keywords",
+      "value": "search_music is missing the required parameter keywords"
+    },
+    {
+      "name": "unison_plus_tool_search_returned",
+      "value": "Returned search results"
+    },
+    {
+      "name": "unison_plus_tool_unknown_prefix",
+      "value": "Unknown tool: "
+    },
+    {
+      "name": "setting_about_app_name",
+      "value": "App Name"
+    },
+    {
+      "name": "setting_about_version",
+      "value": "Version"
+    },
+    {
+      "name": "setting_about_bundle",
+      "value": "Bundle ID"
+    },
+    {
+      "name": "audio_effects_title",
+      "value": "Audio Effects"
+    },
+    {
+      "name": "audio_effects_eq",
+      "value": "Equalizer"
+    },
+    {
+      "name": "audio_effects_eq_desc",
+      "value": "Adjust 10-band gains"
+    },
+    {
+      "name": "audio_effects_eq_disabled",
+      "value": "Enable EQ to shape the sound"
+    },
+    {
+      "name": "audio_effects_drc",
+      "value": "DRC"
+    },
+    {
+      "name": "audio_effects_drc_desc",
+      "value": "Control audio dynamics"
+    },
+    {
+      "name": "audio_effects_drc_disabled",
+      "value": "Enable DRC to control dynamics"
+    },
+    {
+      "name": "audio_effects_drc_threshold",
+      "value": "Threshold"
+    },
+    {
+      "name": "audio_effects_drc_ratio",
+      "value": "Ratio"
+    },
+    {
+      "name": "audio_effects_drc_attack",
+      "value": "Attack"
+    },
+    {
+      "name": "audio_effects_drc_release",
+      "value": "Release"
+    },
+    {
+      "name": "audio_effects_drc_makeup",
+      "value": "Makeup"
+    },
+    {
+      "name": "audio_effects_volume_coeff",
+      "value": "Balance"
+    },
+    {
+      "name": "audio_effects_volume_coeff_desc",
+      "value": "Adjust left/right channel volume"
+    },
+    {
+      "name": "audio_effects_volume_coeff_disabled",
+      "value": "Enable balance to adjust channels"
+    },
+    {
+      "name": "audio_effects_volume_coeff_short",
+      "value": "Balance"
+    },
+    {
+      "name": "audio_effects_volume_left",
+      "value": "Left"
+    },
+    {
+      "name": "audio_effects_volume_right",
+      "value": "Right"
+    },
+    {
+      "name": "audio_effects_preset",
+      "value": "Preset"
+    },
+    {
+      "name": "audio_effects_balance_center",
+      "value": "Center"
+    },
+    {
+      "name": "audio_effects_balance_left",
+      "value": "Left"
+    },
+    {
+      "name": "audio_effects_balance_right",
+      "value": "Right"
+    },
+    {
+      "name": "eq_preset_default",
+      "value": "Default"
+    },
+    {
+      "name": "eq_preset_pop",
+      "value": "Pop"
+    },
+    {
+      "name": "eq_preset_rock",
+      "value": "Rock"
+    },
+    {
+      "name": "eq_preset_jazz",
+      "value": "Jazz"
+    },
+    {
+      "name": "eq_preset_classical",
+      "value": "Classical"
+    },
+    {
+      "name": "eq_preset_dance",
+      "value": "Dance"
+    },
+    {
+      "name": "eq_preset_ballads",
+      "value": "Ballads"
+    },
+    {
+      "name": "eq_preset_rnb",
+      "value": "R&B"
+    },
+    {
+      "name": "eq_preset_voice",
+      "value": "Voice"
+    },
+    {
+      "name": "eq_preset_electronic",
+      "value": "Electronic"
+    },
+    {
+      "name": "drc_preset_default",
+      "value": "Default"
+    },
+    {
+      "name": "drc_preset_speech",
+      "value": "Speech"
+    },
+    {
+      "name": "drc_preset_vocal",
+      "value": "Pop Vocal"
+    },
+    {
+      "name": "drc_preset_night",
+      "value": "Night"
+    },
+    {
+      "name": "drc_preset_mastering",
+      "value": "Mastering"
+    },
+    {
+      "name": "drc_preset_punch",
+      "value": "Punch"
+    },
+    {
+      "name": "drc_preset_broadcast",
+      "value": "Broadcast"
+    },
+    {
+      "name": "drc_preset_limiter",
+      "value": "Limiter"
+    },
+    {
+      "name": "drc_preset_crush",
+      "value": "Crush"
+    },
+    {
+      "name": "audio_effects_custom",
+      "value": "Custom"
+    },
+    {
+      "name": "audio_effects_custom_named",
+      "value": "%s (Custom)"
+    },
+    {
+      "name": "audio_effects_save_preset",
+      "value": "Save preset"
+    },
+    {
+      "name": "audio_effects_save_preset_title",
+      "value": "Save preset"
+    },
+    {
+      "name": "audio_effects_save_preset_placeholder",
+      "value": "Enter preset name"
+    },
+    {
+      "name": "audio_effects_action_cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "audio_effects_action_save",
+      "value": "Save"
+    },
+    {
+      "name": "audio_effects_delete_preset_title",
+      "value": "Delete preset"
+    },
+    {
+      "name": "audio_effects_delete_preset_message",
+      "value": "Are you sure you want to delete preset %s? This action cannot be undone."
+    },
+    {
+      "name": "audio_effects_action_delete",
+      "value": "Delete"
+    },
+    {
+      "name": "now_playing_lyrics_empty",
+      "value": "No lyrics available"
+    }
+  ]
+}

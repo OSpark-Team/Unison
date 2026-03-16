@@ -1,0 +1,1232 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "Unison音乐"
+    },
+    {
+      "name": "toolbar_home_title",
+      "value": "首页"
+    },
+    {
+      "name": "toolbar_library_title",
+      "value": "音乐库"
+    },
+    {
+      "name": "toolbar_ai_title",
+      "value": "Unison+"
+    },
+    {
+      "name": "toolbar_my_title",
+      "value": "我的"
+    },
+    {
+      "name": "menu_new_songs",
+      "value": "新歌速递"
+    },
+    {
+      "name": "menu_recommended_playlists",
+      "value": "推荐歌单"
+    },
+    {
+      "name": "menu_recommended_artists",
+      "value": "推荐艺人"
+    },
+    {
+      "name": "menu_top_charts",
+      "value": "排行榜"
+    },
+    {
+      "name": "no_data_source_title",
+      "value": "暂无数据源"
+    },
+    {
+      "name": "no_data_source_description",
+      "value": "请添加音乐数据源以开始使用，单击此处开始。"
+    },
+    {
+      "name": "add_first_data_source",
+      "value": "添加第一个数据源"
+    },
+    {
+      "name": "add_data_source",
+      "value": "添加数据源"
+    },
+    {
+      "name": "edit_data_source",
+      "value": "编辑数据源"
+    },
+    {
+      "name": "delete_data_source_title",
+      "value": "删除数据源"
+    },
+    {
+      "name": "delete_data_source_message",
+      "value": "确定要删除数据源 \"%s\" 吗？此操作不可撤销。"
+    },
+    {
+      "name": "data_source_name",
+      "value": "数据源名称"
+    },
+    {
+      "name": "data_source_name_placeholder",
+      "value": "请输入数据源名称"
+    },
+    {
+      "name": "data_source_url",
+      "value": "数据源地址"
+    },
+    {
+      "name": "data_source_url_placeholder",
+      "value": "请输入数据源地址，如：https://example.com"
+    },
+    {
+      "name": "data_source_description",
+      "value": "数据源描述"
+    },
+    {
+      "name": "data_source_description_placeholder",
+      "value": "请输入数据源描述（可选）"
+    },
+    {
+      "name": "credential_token",
+      "value": "凭证信息"
+    },
+    {
+      "name": "credential_token_placeholder",
+      "value": "请输入凭证信息（Cookie 或 JWT）"
+    },
+    {
+      "name": "qr_code_credential_title",
+      "value": "扫码获取凭证"
+    },
+    {
+      "name": "qr_code_credential_description",
+      "value": "您也可以通过扫描二维码的方式快速获取凭证信息"
+    },
+    {
+      "name": "generate_qr_code",
+      "value": "生成二维码"
+    },
+    {
+      "name": "regenerate_qr_code",
+      "value": "重新生成"
+    },
+    {
+      "name": "edit",
+      "value": "编辑"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "save",
+      "value": "保存"
+    },
+    {
+      "name": "next",
+      "value": "下一步"
+    },
+    {
+      "name": "back",
+      "value": "返回"
+    },
+    {
+      "name": "add_source_success",
+      "value": "数据源添加成功"
+    },
+    {
+      "name": "add_source_failed",
+      "value": "数据源添加失败：%s"
+    },
+    {
+      "name": "update_source_success",
+      "value": "数据源更新成功"
+    },
+    {
+      "name": "update_source_failed",
+      "value": "数据源更新失败：%s"
+    },
+    {
+      "name": "delete_success",
+      "value": "删除成功"
+    },
+    {
+      "name": "delete_failed",
+      "value": "删除失败：%s"
+    },
+    {
+      "name": "form_error_name_required",
+      "value": "请输入数据源名称"
+    },
+    {
+      "name": "form_error_url_required",
+      "value": "请输入数据源地址"
+    },
+    {
+      "name": "form_error_url_invalid",
+      "value": "请输入有效的数据源地址"
+    },
+    {
+      "name": "form_error_token_required",
+      "value": "请输入凭证信息或使用二维码获取"
+    },
+    {
+      "name": "setting_group_general",
+      "value": "通用设置"
+    },
+    {
+      "name": "setting_group_playback",
+      "value": "播放设置"
+    },
+    {
+      "name": "setting_group_about",
+      "value": "关于"
+    },
+    {
+      "name": "setting_theme",
+      "value": "主题"
+    },
+    {
+      "name": "setting_theme_desc",
+      "value": "选择应用主题"
+    },
+    {
+      "name": "setting_language",
+      "value": "语言"
+    },
+    {
+      "name": "setting_language_desc",
+      "value": "选择应用语言"
+    },
+    {
+      "name": "setting_cache",
+      "value": "缓存管理"
+    },
+    {
+      "name": "setting_cache_desc",
+      "value": "清理应用缓存"
+    },
+    {
+      "name": "setting_audio_quality",
+      "value": "音质设置"
+    },
+    {
+      "name": "setting_audio_quality_desc",
+      "value": "选择播放音质"
+    },
+    {
+      "name": "setting_playback_network",
+      "value": "播放网络"
+    },
+    {
+      "name": "setting_playback_network_wifi_only",
+      "value": "仅 WLAN"
+    },
+    {
+      "name": "setting_playback_network_both",
+      "value": "WLAN 与移动网络"
+    },
+    {
+      "name": "setting_playback_mode",
+      "value": "播放模式"
+    },
+    {
+      "name": "setting_playback_mode_desc",
+      "value": "设置播放模式"
+    },
+    {
+      "name": "setting_about_app",
+      "value": "关于应用"
+    },
+    {
+      "name": "setting_about_app_desc",
+      "value": "查看应用信息"
+    },
+    {
+      "name": "setting_help",
+      "value": "帮助"
+    },
+    {
+      "name": "setting_help_desc",
+      "value": "获取使用帮助"
+    },
+    {
+      "name": "setting_feedback",
+      "value": "意见反馈"
+    },
+    {
+      "name": "setting_feedback_desc",
+      "value": "提交意见和建议"
+    },
+    {
+      "name": "sheet_title_feedback",
+      "value": "意见反馈"
+    },
+    {
+      "name": "setting_feedback_sheet_desc",
+      "value": "欢迎告诉我们你的使用感受、建议或遇到的问题。"
+    },
+    {
+      "name": "setting_feedback_version_hint",
+      "value": "提交时会自动附带当前应用版本信息。"
+    },
+    {
+      "name": "setting_feedback_content_label",
+      "value": "反馈建议"
+    },
+    {
+      "name": "setting_feedback_content_placeholder",
+      "value": "请描述你的想法、建议或遇到的问题"
+    },
+    {
+      "name": "setting_feedback_contact_label",
+      "value": "跟踪联系方式（选填）"
+    },
+    {
+      "name": "setting_feedback_contact_placeholder",
+      "value": "邮箱、QQ、Telegram 等"
+    },
+    {
+      "name": "setting_feedback_submit",
+      "value": "提交反馈"
+    },
+    {
+      "name": "setting_feedback_submitting",
+      "value": "提交中..."
+    },
+    {
+      "name": "setting_feedback_validation_error",
+      "value": "请先填写反馈建议"
+    },
+    {
+      "name": "setting_feedback_submit_success",
+      "value": "反馈提交成功，感谢你的支持"
+    },
+    {
+      "name": "setting_feedback_submit_failed",
+      "value": "反馈提交失败，请稍后重试"
+    },
+    {
+      "name": "loading",
+      "value": "加载中..."
+    },
+    {
+      "name": "error_occurred",
+      "value": "发生错误"
+    },
+    {
+      "name": "retry",
+      "value": "重试"
+    },
+    {
+      "name": "qr_status_expired",
+      "value": "二维码已过期，请重新生成"
+    },
+    {
+      "name": "qr_status_waiting",
+      "value": "等待扫码..."
+    },
+    {
+      "name": "qr_status_confirm",
+      "value": "请在客户端上确认登录"
+    },
+    {
+      "name": "qr_status_success",
+      "value": "授权登录成功"
+    },
+    {
+      "name": "qr_generating",
+      "value": "正在生成二维码..."
+    },
+    {
+      "name": "qr_scan_prompt",
+      "value": "请扫描二维码"
+    },
+    {
+      "name": "qr_generate_failed",
+      "value": "二维码生成失败"
+    },
+    {
+      "name": "qr_check_status_failed",
+      "value": "检查状态失败"
+    },
+    {
+      "name": "error_qr_generate_failed",
+      "value": "生成二维码失败: %s"
+    },
+    {
+      "name": "error_database_not_initialized",
+      "value": "数据库未初始化"
+    },
+    {
+      "name": "error_load_sources_failed",
+      "value": "加载数据源列表失败: %s"
+    },
+    {
+      "name": "error_add_source_failed",
+      "value": "添加数据源配置失败: %s"
+    },
+    {
+      "name": "error_update_source_failed",
+      "value": "更新数据源配置失败: %s"
+    },
+    {
+      "name": "error_delete_source_failed",
+      "value": "删除数据源配置失败: %s"
+    },
+    {
+      "name": "error_source_not_found",
+      "value": "未找到要删除的数据源: %s"
+    },
+    {
+      "name": "error_refresh_sources_failed",
+      "value": "刷新数据源列表失败: %s"
+    },
+    {
+      "name": "error_check_qr_status_failed",
+      "value": "检查二维码状态失败: %s"
+    },
+    {
+      "name": "set_main",
+      "value": "设置为主数据源"
+    },
+    {
+      "name": "playlist_track_count",
+      "value": "%s 首歌曲"
+    },
+    {
+      "name": "add_next_song",
+      "value": "添加到下一首播放"
+    },
+    {
+      "name": "close",
+      "value": "关闭"
+    },
+    {
+      "name": "playlist_detail_title",
+      "value": "歌单详情"
+    },
+    {
+      "name": "play_all",
+      "value": "播放全部"
+    },
+    {
+      "name": "play_all_with_count",
+      "value": "播放全部 %d"
+    },
+    {
+      "name": "song_count",
+      "value": "%d首歌曲"
+    },
+    {
+      "name": "song_count_simple",
+      "value": "%d首"
+    },
+    {
+      "name": "playlist_created_by",
+      "value": "创建者：%s"
+    },
+    {
+      "name": "playlist_description_empty",
+      "value": "暂无描述"
+    },
+    {
+      "name": "playlist_loading",
+      "value": "加载中..."
+    },
+    {
+      "name": "playlist_load_failed",
+      "value": "加载失败"
+    },
+    {
+      "name": "playlist_empty",
+      "value": "歌单为空"
+    },
+    {
+      "name": "playlist_retry",
+      "value": "重试"
+    },
+    {
+      "name": "add_to_playlist",
+      "value": "添加到歌单"
+    },
+    {
+      "name": "download_song",
+      "value": "下载歌曲"
+    },
+    {
+      "name": "share_playlist",
+      "value": "分享歌单"
+    },
+    {
+      "name": "collect_playlist",
+      "value": "收藏歌单"
+    },
+    {
+      "name": "playlist_info",
+      "value": "歌单信息"
+    },
+    {
+      "name": "search_placeholder",
+      "value": "搜索歌曲、艺术家、专辑"
+    },
+    {
+      "name": "home_search_placeholder",
+      "value": "搜索歌曲、艺术家、歌单、专辑"
+    },
+    {
+      "name": "search_songs",
+      "value": "搜索歌曲"
+    },
+    {
+      "name": "search_clear",
+      "value": "清除搜索"
+    },
+    {
+      "name": "library_title",
+      "value": "音乐库"
+    },
+    {
+      "name": "library_search_placeholder",
+      "value": "搜索歌单"
+    },
+    {
+      "name": "library_source_switch",
+      "value": "切换数据源"
+    },
+    {
+      "name": "library_empty_title",
+      "value": "暂无歌单"
+    },
+    {
+      "name": "library_empty_description",
+      "value": "您还没有创建或收藏任何歌单"
+    },
+    {
+      "name": "library_playlist_count",
+      "value": "%d 个歌单"
+    },
+    {
+      "name": "library_no_source_title",
+      "value": "未选择数据源"
+    },
+    {
+      "name": "library_no_source_description",
+      "value": "请先添加并选择一个数据源"
+    },
+    {
+      "name": "library_loading",
+      "value": "加载中..."
+    },
+    {
+      "name": "approximately_datasync_reason",
+      "value": "跨设备数据同步"
+    },
+    {
+      "name": "unsupported_version",
+      "value": "当前版本不支持"
+    },
+    {
+      "name": "approximately_background_running_reason",
+      "value": "音乐播放"
+    },
+    {
+      "name": "empty_url",
+      "value": "服务器没有返回播放链接"
+    },
+    {
+      "name": "wifi_only",
+      "value": "当前网络状态为蜂窝数据，是否继续播放？"
+    },
+    {
+      "name": "no_network",
+      "value": "当前没有网络连接"
+    },
+    {
+      "name": "wifi_only_title",
+      "value": "使用数据流量播放"
+    },
+    {
+      "name": "confirm",
+      "value": "确认"
+    },
+    {
+      "name": "not_playing",
+      "value": "暂无播放"
+    },
+    {
+      "name": "unknown_song",
+      "value": "未知歌曲"
+    },
+    {
+      "name": "cancel_favorite",
+      "value": "取消收藏"
+    },
+    {
+      "name": "favorite",
+      "value": "收藏"
+    },
+    {
+      "name": "cancel_favorite_message",
+      "value": "是否要取消收藏歌单 %s ？"
+    },
+    {
+      "name": "favorite_message",
+      "value": "是否要收藏歌单 %s ？"
+    },
+    {
+      "name": "favorite_success",
+      "value": "收藏成功"
+    },
+    {
+      "name": "cancel_favorite_success",
+      "value": "取消收藏成功"
+    },
+    {
+      "name": "now_playing_queue_title",
+      "value": "当前播放列表"
+    },
+    {
+      "name": "now_playing_queue_empty",
+      "value": "播放列表为空"
+    },
+    {
+      "name": "now_playing_lyrics_placeholder",
+      "value": "正在获取歌词..."
+    },
+    {
+      "name": "now_playing_lyrics_empty",
+      "value": "暂无歌词"
+    },
+    {
+      "name": "now_playing_landscape_mode",
+      "value": "横屏模式"
+    },
+    {
+      "name": "sheet_title_theme",
+      "value": "选择主题"
+    },
+    {
+      "name": "sheet_title_language",
+      "value": "选择语言"
+    },
+    {
+      "name": "sheet_title_bitrate",
+      "value": "音质设置"
+    },
+    {
+      "name": "setting_theme_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "setting_theme_light",
+      "value": "亮色"
+    },
+    {
+      "name": "setting_theme_dark",
+      "value": "暗色"
+    },
+    {
+      "name": "setting_language_zh",
+      "value": "简体中文"
+    },
+    {
+      "name": "setting_language_en",
+      "value": "English"
+    },
+    {
+      "name": "setting_bitrate_standard",
+      "value": "标准"
+    },
+    {
+      "name": "setting_bitrate_higher",
+      "value": "较高"
+    },
+    {
+      "name": "setting_bitrate_exhigh",
+      "value": "极高"
+    },
+    {
+      "name": "setting_bitrate_lossless",
+      "value": "无损"
+    },
+    {
+      "name": "setting_bitrate_hires",
+      "value": "Hi-Res"
+    },
+    {
+      "name": "setting_bitrate_vivd",
+      "value": "Audio Vivid"
+    },
+    {
+      "name": "setting_playback_bitrate_data",
+      "value": "数据流量播放音质"
+    },
+    {
+      "name": "setting_playback_bitrate_wifi",
+      "value": "WLAN 播放音质"
+    },
+    {
+      "name": "setting_playback_bitrate",
+      "value": "播放音质"
+    },
+    {
+      "name": "setting_download_bitrate",
+      "value": "下载音质"
+    },
+    {
+      "name": "setting_group_experimental",
+      "value": "实验性功能"
+    },
+    {
+      "name": "setting_experimental_desc",
+      "value": "这些功能正在开发中，可能不稳定"
+    },
+    {
+      "name": "setting_experimental_audio_rhythm",
+      "value": "音频律动"
+    },
+    {
+      "name": "setting_experimental_audio_rhythm_desc",
+      "value": "根据音频进行震动律动"
+    },
+    {
+      "name": "setting_experimental_audio_rhythm_hint",
+      "value": "部分设备没有振动马达，开启后也可能无法使用该功能"
+    },
+    {
+      "name": "setting_experimental_word_for_word_lyrics",
+      "value": "逐字歌词"
+    },
+    {
+      "name": "setting_experimental_word_for_word_lyrics_desc",
+      "value": "优先渲染逐字歌词，可能增加歌词界面的渲染压力"
+    },
+    {
+      "name": "setting_experimental_playing_mix",
+      "value": "多音频并发播放"
+    },
+    {
+      "name": "setting_experimental_playing_mix_desc",
+      "value": "允许与其他音频源同时播放，避免独占音频输出"
+    },
+    {
+      "name": "setting_experimental_placeholder",
+      "value": "占位"
+    },
+    {
+      "name": "setting_group_unison_plus",
+      "value": "Unison+ 设置"
+    },
+    {
+      "name": "setting_byok_title",
+      "value": "BYOK"
+    },
+    {
+      "name": "setting_byok_desc",
+      "value": "设置自己的 API Key、API Base 与模型名称"
+    },
+    {
+      "name": "setting_byok_api_key",
+      "value": "API Key"
+    },
+    {
+      "name": "setting_byok_api_key_placeholder",
+      "value": "请输入 API Key"
+    },
+    {
+      "name": "setting_byok_api_base",
+      "value": "API Base"
+    },
+    {
+      "name": "setting_byok_api_base_placeholder",
+      "value": "请输入 API Base（OpenAI 兼容）"
+    },
+    {
+      "name": "setting_byok_api_model",
+      "value": "模型名称"
+    },
+    {
+      "name": "setting_byok_api_model_placeholder",
+      "value": "请输入模型名称，例如 gpt-4o-mini"
+    },
+    {
+      "name": "unison_plus_title",
+      "value": "Unison+"
+    },
+    {
+      "name": "unison_plus_subtitle",
+      "value": "使用你自己的 OpenAI 兼容 API，让 AI 帮你搜索音乐、查看数据源并切换默认数据源。"
+    },
+    {
+      "name": "unison_plus_empty_title",
+      "value": "开始一段对话"
+    },
+    {
+      "name": "unison_plus_empty_desc",
+      "value": "例如：把某个数据源设为默认，或者帮我搜索周杰伦的歌。"
+    },
+    {
+      "name": "unison_plus_input_placeholder",
+      "value": "输入你想让 Unison+ 帮你完成的事情"
+    },
+    {
+      "name": "unison_plus_send",
+      "value": "发送"
+    },
+    {
+      "name": "unison_plus_sending",
+      "value": "处理中..."
+    },
+    {
+      "name": "unison_plus_missing_config",
+      "value": "尚未配置 BYOK"
+    },
+    {
+      "name": "unison_plus_config_hint",
+      "value": "请先前往“我的 > 设置 > Unison+ 设置”填写 API Key、API Base 与模型名称。"
+    },
+    {
+      "name": "unison_plus_status",
+      "value": "处理中"
+    },
+    {
+      "name": "unison_plus_thinking",
+      "value": "正在思考"
+    },
+    {
+      "name": "unison_plus_searching",
+      "value": "正在检索"
+    },
+    {
+      "name": "unison_plus_calling_tool",
+      "value": "正在调用工具"
+    },
+    {
+      "name": "unison_plus_fetching_lyric",
+      "value": "正在获取歌词"
+    },
+    {
+      "name": "unison_plus_playing_song",
+      "value": "正在播放"
+    },
+    {
+      "name": "unison_plus_source_switched",
+      "value": "当前默认源"
+    },
+    {
+      "name": "unison_plus_results",
+      "value": "结果"
+    },
+    {
+      "name": "unison_plus_songs",
+      "value": "歌曲"
+    },
+    {
+      "name": "unison_plus_playlists",
+      "value": "歌单"
+    },
+    {
+      "name": "unison_plus_artists",
+      "value": "艺人"
+    },
+    {
+      "name": "unison_plus_albums",
+      "value": "专辑"
+    },
+    {
+      "name": "unison_plus_sources",
+      "value": "数据源"
+    },
+    {
+      "name": "unison_plus_lyrics",
+      "value": "歌词"
+    },
+    {
+      "name": "unison_plus_no_lyric",
+      "value": "暂无歌词内容"
+    },
+    {
+      "name": "unison_plus_translation",
+      "value": "译文"
+    },
+    {
+      "name": "unison_plus_transliteration",
+      "value": "音译"
+    },
+    {
+      "name": "unison_plus_round_limit",
+      "value": "工具调用轮次超过限制，请缩小问题范围后重试"
+    },
+    {
+      "name": "unison_plus_no_model_result",
+      "value": "模型没有返回可用结果"
+    },
+    {
+      "name": "unison_plus_empty_structured_response",
+      "value": "结构化响应为空"
+    },
+    {
+      "name": "unison_plus_no_display_content",
+      "value": "已完成处理，但模型没有返回可展示内容。"
+    },
+    {
+      "name": "unison_plus_song_count_suffix",
+      "value": "首歌曲"
+    },
+    {
+      "name": "unison_plus_tool_running",
+      "value": "进行中"
+    },
+    {
+      "name": "unison_plus_tool_done",
+      "value": "已完成"
+    },
+    {
+      "name": "unison_plus_tool_failed",
+      "value": "失败"
+    },
+    {
+      "name": "unison_plus_request_failed",
+      "value": "请求失败"
+    },
+    {
+      "name": "unison_plus_tool_timeline",
+      "value": "工具执行过程"
+    },
+    {
+      "name": "unison_plus_tool_list_sources",
+      "value": "列出数据源"
+    },
+    {
+      "name": "unison_plus_tool_set_main_source",
+      "value": "切换默认数据源"
+    },
+    {
+      "name": "unison_plus_tool_get_user_playlists",
+      "value": "获取用户歌单"
+    },
+    {
+      "name": "unison_plus_tool_get_song_lyric",
+      "value": "获取歌曲歌词"
+    },
+    {
+      "name": "unison_plus_tool_search_music",
+      "value": "搜索音乐"
+    },
+    {
+      "name": "unison_plus_switched_to",
+      "value": "已切换到"
+    },
+    {
+      "name": "unison_plus_tool_returned_prefix",
+      "value": "已返回"
+    },
+    {
+      "name": "unison_plus_tool_sources_count_suffix",
+      "value": "个数据源"
+    },
+    {
+      "name": "unison_plus_tool_playlists_count_suffix",
+      "value": "个播放列表"
+    },
+    {
+      "name": "unison_plus_tool_set_main_source_prefix",
+      "value": "已将"
+    },
+    {
+      "name": "unison_plus_tool_set_main_source_suffix",
+      "value": "设置为默认数据源"
+    },
+    {
+      "name": "unison_plus_tool_no_source_available",
+      "value": "当前没有可用数据源"
+    },
+    {
+      "name": "unison_plus_tool_missing_uid",
+      "value": "当前数据源没有可用的 uid，请先登录或显式传入 uid"
+    },
+    {
+      "name": "unison_plus_tool_missing_song_id",
+      "value": "get_song_lyric 缺少必填参数 id"
+    },
+    {
+      "name": "unison_plus_tool_lyric_returned",
+      "value": "已返回歌曲歌词"
+    },
+    {
+      "name": "unison_plus_tool_missing_keywords",
+      "value": "search_music 缺少必填参数 keywords"
+    },
+    {
+      "name": "unison_plus_tool_search_returned",
+      "value": "已返回搜索结果"
+    },
+    {
+      "name": "unison_plus_tool_unknown_prefix",
+      "value": "未知工具："
+    },
+    {
+      "name": "setting_about_app_name",
+      "value": "应用名称"
+    },
+    {
+      "name": "setting_about_version",
+      "value": "版本号"
+    },
+    {
+      "name": "setting_about_bundle",
+      "value": "Bundle ID"
+    },
+    {
+      "name": "audio_effects_title",
+      "value": "音频效果"
+    },
+    {
+      "name": "audio_effects_eq",
+      "value": "均衡器"
+    },
+    {
+      "name": "audio_effects_eq_desc",
+      "value": "调节十段频率增益"
+    },
+    {
+      "name": "audio_effects_eq_disabled",
+      "value": "开启均衡器以调节音色"
+    },
+    {
+      "name": "audio_effects_drc",
+      "value": "动态范围压缩"
+    },
+    {
+      "name": "audio_effects_drc_desc",
+      "value": "控制音频动态范围"
+    },
+    {
+      "name": "audio_effects_drc_disabled",
+      "value": "开启 DRC 以控制动态范围"
+    },
+    {
+      "name": "audio_effects_drc_threshold",
+      "value": "阈值"
+    },
+    {
+      "name": "audio_effects_drc_ratio",
+      "value": "压缩比"
+    },
+    {
+      "name": "audio_effects_drc_attack",
+      "value": "起始时间"
+    },
+    {
+      "name": "audio_effects_drc_release",
+      "value": "释放时间"
+    },
+    {
+      "name": "audio_effects_drc_makeup",
+      "value": "补偿增益"
+    },
+    {
+      "name": "audio_effects_volume_coeff",
+      "value": "声道平衡"
+    },
+    {
+      "name": "audio_effects_volume_coeff_desc",
+      "value": "独立调节左右声道音量"
+    },
+    {
+      "name": "audio_effects_volume_coeff_disabled",
+      "value": "开启声道平衡以调节音量"
+    },
+    {
+      "name": "audio_effects_volume_coeff_short",
+      "value": "声道平衡"
+    },
+    {
+      "name": "audio_effects_volume_left",
+      "value": "左声道"
+    },
+    {
+      "name": "audio_effects_volume_right",
+      "value": "右声道"
+    },
+    {
+      "name": "audio_effects_preset",
+      "value": "预设"
+    },
+    {
+      "name": "audio_effects_balance_center",
+      "value": "居中"
+    },
+    {
+      "name": "audio_effects_balance_left",
+      "value": "左声道"
+    },
+    {
+      "name": "audio_effects_balance_right",
+      "value": "右声道"
+    },
+    {
+      "name": "eq_preset_default",
+      "value": "标准"
+    },
+    {
+      "name": "eq_preset_pop",
+      "value": "流行"
+    },
+    {
+      "name": "eq_preset_rock",
+      "value": "摇滚"
+    },
+    {
+      "name": "eq_preset_jazz",
+      "value": "爵士"
+    },
+    {
+      "name": "eq_preset_classical",
+      "value": "古典"
+    },
+    {
+      "name": "eq_preset_dance",
+      "value": "舞曲"
+    },
+    {
+      "name": "eq_preset_ballads",
+      "value": "民谣"
+    },
+    {
+      "name": "eq_preset_rnb",
+      "value": "R&B"
+    },
+    {
+      "name": "eq_preset_voice",
+      "value": "人声"
+    },
+    {
+      "name": "eq_preset_electronic",
+      "value": "电子"
+    },
+    {
+      "name": "drc_preset_default",
+      "value": "通用标准"
+    },
+    {
+      "name": "drc_preset_speech",
+      "value": "人声对白"
+    },
+    {
+      "name": "drc_preset_vocal",
+      "value": "流行歌唱"
+    },
+    {
+      "name": "drc_preset_night",
+      "value": "深夜模式"
+    },
+    {
+      "name": "drc_preset_mastering",
+      "value": "母带柔化"
+    },
+    {
+      "name": "drc_preset_punch",
+      "value": "打击增强"
+    },
+    {
+      "name": "drc_preset_broadcast",
+      "value": "广播电台"
+    },
+    {
+      "name": "drc_preset_limiter",
+      "value": "安全限幅"
+    },
+    {
+      "name": "drc_preset_crush",
+      "value": "毁灭压缩"
+    },
+    {
+      "name": "audio_effects_custom",
+      "value": "自定义"
+    },
+    {
+      "name": "audio_effects_custom_named",
+      "value": "%s（自定义）"
+    },
+    {
+      "name": "audio_effects_save_preset",
+      "value": "保存预设"
+    },
+    {
+      "name": "audio_effects_save_preset_title",
+      "value": "保存预设"
+    },
+    {
+      "name": "audio_effects_save_preset_placeholder",
+      "value": "请输入预设名称"
+    },
+    {
+      "name": "audio_effects_action_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "audio_effects_action_save",
+      "value": "保存"
+    },
+    {
+      "name": "audio_effects_delete_preset_title",
+      "value": "删除预设"
+    },
+    {
+      "name": "audio_effects_delete_preset_message",
+      "value": "确定要删除预设 %s 吗？此操作不可撤销。"
+    },
+    {
+      "name": "audio_effects_action_delete",
+      "value": "删除"
+    },
+    {
+      "name": "sleep_timer_title",
+      "value": "定时播放"
+    },
+    {
+      "name": "sleep_timer_remaining",
+      "value": "剩余时间：%s"
+    },
+    {
+      "name": "sleep_timer_unit_hint",
+      "value": "选择预设或输入分钟数"
+    },
+    {
+      "name": "sleep_timer_minutes",
+      "value": "%d 分钟"
+    },
+    {
+      "name": "sleep_timer_custom_title",
+      "value": "自定义分钟"
+    },
+    {
+      "name": "sleep_timer_custom_placeholder",
+      "value": "请输入分钟（整数）"
+    },
+    {
+      "name": "sleep_timer_set",
+      "value": "设置"
+    },
+    {
+      "name": "sleep_timer_cancel",
+      "value": "取消定时"
+    }
+  ]
+}
