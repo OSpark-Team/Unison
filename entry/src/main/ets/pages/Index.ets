@@ -326,7 +326,8 @@ struct Index {
                 iconColor: $r('sys.color.icon_primary')
               }
             }
-          }
+          },
+          blurStrategy:this.currentIndex!=2? 0:1,
           },
         avoidLayoutSafeArea: true,
         padding: {
