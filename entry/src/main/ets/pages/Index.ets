@@ -1,18 +1,17 @@
-import { AppStorageV2, CommonModifier, LengthMetrics, PersistenceV2 } from '@kit.ArkUI';
+import { AppStorageV2, CommonModifier, LengthMetrics, PersistenceV2, curves } from '@kit.ArkUI';
 import { BreakpointConstants } from '../common/BreakpointConstants';
 import { WindowProperties } from '../model/WindowProperties';
 import { HomeView } from '../view/HomeView';
 import { LibraryView } from '../view/LibraryView';
 import { MyView } from '../view/MyView';
 import { UnisonPlusView } from '../view/UnisonPlusView';
-import { MiniPlayerShell } from '../components/MiniPlayerShell';
 import { SourceListViewModel } from '../viewmodel/SourceListViewModel';
 import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit';
 import CurrentSourceViewModel from '../viewmodel/CurrentSourceViewModel';
 import { ContinueSwitch } from '../utils/Continue';
 import { PlaylistDetailParam } from './PlaylistDetail';
 import SettingViewModel from '../viewmodel/SettingViewModel';
-import { MiniPlayerUiState } from '../model/MiniPlayerUiState';
+import { DynamicIsland } from '../components/DynamicIsland';
 
 @Entry
 @ComponentV2
@@ -41,10 +40,17 @@ struct Index {
    */
   @Local sourceListViewModel: SourceListViewModel =
     AppStorageV2.connect(SourceListViewModel, 'SourceListViewModel', () => new SourceListViewModel())!;
-  @Local miniPlayerUiState: MiniPlayerUiState =
-    AppStorageV2.connect(MiniPlayerUiState, 'MiniPlayerUiState', () => new MiniPlayerUiState())!;
-  @Local homeMiniPlayerVisible: boolean = true;
-  @Local libraryMiniPlayerVisible: boolean = true;
+  /**
+   * 是否显示灵动岛
+   */
+  @Local showDynamicIsland: boolean = true;
+
+  /**
+   * 是否展开灵动岛
+   */
+  @Local isDynamicIslandExpanded: boolean = false;
+
+
   /**
    /** tab栏构建器 */
   @Builder
@@ -118,33 +124,6 @@ struct Index {
       })
   }
 
-  private shouldShowMiniPlayer(): boolean {
-    if (this.miniPlayerUiState.nowPlayingLandscapeActive) {
-      return false;
-    }
-    if (this.miniPlayerUiState.contentCardDetailActive) {
-      return false;
-    }
-    if (this.miniPlayerUiState.playlistDetailActive) {
-      return this.miniPlayerUiState.playlistDetailVisible;
-    }
-    if (this.currentIndex === 0) {
-      return this.homeMiniPlayerVisible;
-    }
-    if (this.currentIndex === 1) {
-      return this.libraryMiniPlayerVisible;
-    }
-    return false;
-  }
-
-  onBackPress(): boolean {
-    if (this.miniPlayerUiState.isExpanded) {
-      this.miniPlayerUiState.collapseRequestVersion += 1;
-      return true;
-    }
-    return false;
-  }
-
   // /**
   //  * 搜索Builder
   //  */
@@ -194,21 +173,13 @@ struct Index {
         { top: "15%", bottom: "15%" } : 0)
     }) {
       TabContent() {
-        HomeView({
-          onMiniPlayerVisibilityChange: (visible: boolean) => {
-            this.homeMiniPlayerVisible = visible;
-          }
-        })
+        HomeView()
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_home_title'), 0, $r('sys.symbol.house_fill'),
         $r('sys.symbol.house')))
 
       TabContent() {
-        LibraryView({
-          onMiniPlayerVisibilityChange: (visible: boolean) => {
-            this.libraryMiniPlayerVisible = visible;
-          }
-        })
+        LibraryView()
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_library_title'), 1, $r('sys.symbol.puzzle_fill'),
         $r('sys.symbol.puzzle')))
@@ -293,7 +264,7 @@ struct Index {
         isExpanded: this.isDynamicIslandExpanded!!,
         expandAlignment: Alignment.TopEnd,
         compWidthCollapsed: 120,
-        compWidthExpanded: this.windowProperties.winWidth - 32,
+        compWidthExpanded: this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? this.windowProperties.winWidth - 32 : 360,
         onOpenNowPlaying: () => {
           this.getUIContext()?.animateTo({
             curve: curves.interpolatingSpring(0, 1, 328, 37)
@@ -313,12 +284,12 @@ struct Index {
   }
 
   build() {
-    Stack({ alignContent: Alignment.Bottom }) {
+    Stack({ alignContent: Alignment.Top }) {
       HdsNavigation(this.pageInfos) {
         this.Main()
       }
-      .height('100%')
-      .width('100%')
+      .height("100%")
+      .width("100%")
       .mode(NavigationMode.Stack)
       .backgroundColor($r('app.color.background_primary'))
       .hideBackButton(true)
@@ -326,7 +297,7 @@ struct Index {
       .titleBar({
         content: {
           title: {
-            mainTitle: 'Unison',
+            mainTitle: "Unison",
           },
         },
         avoidLayoutSafeArea: true,
@@ -336,15 +307,14 @@ struct Index {
         },
       })
       .titleMode(HdsNavigationTitleMode.MINI)
-
-      MiniPlayerShell({
-        visible: this.shouldShowMiniPlayer(),
-        bottomOffset: this.windowProperties.bottomRect + 12
+      .onTouch(()=>{
+        this.isDynamicIslandExpanded = false;
       })
-        .width('100%')
+
+
+      this.buildFloatingDynamicIsland()
     }
-    .height('100%')
-    .width('100%')
-    .backgroundColor($r('app.color.background_primary'))
+    .width("100%")
+    .height("100%")
   }
 }
