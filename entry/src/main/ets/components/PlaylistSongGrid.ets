@@ -52,12 +52,6 @@ export struct PlaylistSongGrid {
    * 歌曲长按回调
    */
   @Param onSongLongPress?: (song: Song, index: number) => void = undefined;
-
-  /** 滚动偏移变化回调 */
-  @Param onScrollOffsetChange?: (offset: number) => void = undefined;
-
-  /** 底部额外留白，避免浮层遮挡 */
-  @Param bottomPadding: number = 0;
   
   /**
    * 是否显示索引号
@@ -80,20 +74,6 @@ export struct PlaylistSongGrid {
    */
   @Local playlistViewModel: PlaylistViewModel =
     AppStorageV2.connect(PlaylistViewModel, 'PlaylistViewModel', () => new PlaylistViewModel())!;
-
-  private scroller: Scroller = new Scroller();
-
-  aboutToAppear(): void {
-    setTimeout(() => {
-      this.emitScrollOffset();
-    }, 0);
-  }
-
-  private emitScrollOffset(): void {
-    if (this.onScrollOffsetChange) {
-      this.onScrollOffsetChange(this.scroller.currentOffset()?.yOffset);
-    }
-  }
 
   /**
    * 判断是否显示分隔线
@@ -163,7 +143,7 @@ export struct PlaylistSongGrid {
    */
   @Builder
   buildLargeScreenGrid() {
-    Grid(this.scroller) {
+    Grid() {
       Repeat<Song>(this.songs)
         .each((song) => {
           GridItem() {
@@ -178,12 +158,8 @@ export struct PlaylistSongGrid {
     .columnsGap(8)
     .width('100%')
     .height('100%')
-    .padding({ bottom: this.bottomPadding })
     .scrollBar(BarState.Auto)
     .edgeEffect(EdgeEffect.Spring)
-    .onDidScroll(() => {
-      this.emitScrollOffset();
-    })
     .nestedScroll({
       scrollForward: NestedScrollMode.PARENT_FIRST,
       scrollBackward: NestedScrollMode.PARENT_FIRST
@@ -195,7 +171,7 @@ export struct PlaylistSongGrid {
    */
   @Builder
   buildMediumScreenGrid() {
-    Grid(this.scroller) {
+    Grid() {
       Repeat<Song>(this.songs)
         .each((song) => {
           GridItem() {
@@ -209,12 +185,8 @@ export struct PlaylistSongGrid {
     .rowsGap(4)
     .width('100%')
     .height('100%')
-    .padding({ bottom: this.bottomPadding })
     .scrollBar(BarState.Auto)
     .edgeEffect(EdgeEffect.Spring)
-    .onDidScroll(() => {
-      this.emitScrollOffset();
-    })
     .nestedScroll({
       scrollForward: NestedScrollMode.PARENT_FIRST,
       scrollBackward: NestedScrollMode.PARENT_FIRST
@@ -226,7 +198,7 @@ export struct PlaylistSongGrid {
    */
   @Builder
   buildSmallScreenList() {
-    List({ space: 4, scroller: this.scroller }) {
+    List({ space: 4 }) {
       Repeat<Song>(this.songs)
         .each((song) => {
           ListItem() {
@@ -238,12 +210,8 @@ export struct PlaylistSongGrid {
     }
     .width('100%')
     .height('100%')
-    .padding({ bottom: this.bottomPadding })
     .scrollBar(BarState.Auto)
     .edgeEffect(EdgeEffect.Spring)
-    .onDidScroll(() => {
-      this.emitScrollOffset();
-    })
     .nestedScroll({
       scrollForward: NestedScrollMode.PARENT_FIRST,
       scrollBackward: NestedScrollMode.PARENT_FIRST

@@ -103,9 +103,8 @@ export function NowPlayingBuilder() {
 }
 
 @ComponentV2
-export struct NowPlaying {
+struct NowPlaying {
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
-  @Param onClose?: () => void = undefined;
 
   @Local playlistViewModel: PlaylistViewModel = AppStorageV2.connect(
     PlaylistViewModel,
@@ -179,8 +178,6 @@ export struct NowPlaying {
   @Local audioBass: number = 0;
   @Local audioMid: number = 0;
   @Local audioTreble: number = 0;
-  private subscriberId: string = 'NowPlaying_' + Date.now().toString() + '_' +
-    Math.floor(Math.random() * 1000000).toString();
   private colorExtractRequestId: number = 0;
   private progressTimerId: number = -1;
   private audioVisualState: AudioVisualState = new AudioVisualState();
@@ -201,8 +198,6 @@ export struct NowPlaying {
   aboutToAppear(): void {
     this.activatePlayerBinding();
     this.lastBreakpoint = this.windowProperties.currentBreakpoint;
-    this.sharedTransitionDisabled = false;
-    this.startTopBarTimer();
   }
 
   @Monitor("windowProperties.currentBreakpoint")
@@ -614,9 +609,7 @@ export struct NowPlaying {
   private handleClose(): void {
     this.isClosing = true;
     this.getUIContext()?.animateTo({ duration: 450, curve: this.springCurve }, () => {
-      if (this.onClose) {
-        this.onClose();
-      }
+      this.pageInfos.pop(false);
     });
   }
 

@@ -1,4 +1,4 @@
-import { AppStorageV2 } from '@kit.ArkUI';
+import { AppStorageV2, curves } from '@kit.ArkUI';
 import { SourceListViewModel } from '../viewmodel/SourceListViewModel';
 import { WindowProperties } from '../model/WindowProperties';
 import { BreakpointConstants } from '../common/BreakpointConstants';
@@ -6,16 +6,17 @@ import { Playlist } from '../model/adapter/Playlist';
 import { Song } from '../model/adapter/Song';
 import { PlaylistInfoCard } from '../components/PlaylistInfoCard';
 import { PlaylistSongGrid } from '../components/PlaylistSongGrid';
+import { PlayerCard } from '../components/PlayerCard';
 import { CustomTitleBar } from '../components/CustomTitleBar';
 import Logger from '../utils/Logger';
-import { HdsNavDestination } from '@kit.UIDesignKit';
+import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { ContinueSwitch } from '../utils/Continue';
 import { PersistenceV2 } from '@kit.ArkUI';
 import SettingViewModel from '../viewmodel/SettingViewModel';
 import PlaylistViewModel from '../viewmodel/PlaylistViewModel';
+import { avSession } from '@kit.AVSessionKit';
 import { PlaylistMeta } from '../model/adapter/PlaylistMeta';
 import { shuffle } from '../utils/Tools';
-import { MiniPlayerUiState } from '../model/MiniPlayerUiState';
 
 const TAG = 'PlaylistDetail';
 
@@ -79,8 +80,6 @@ struct PlaylistDetail {
    */
   @Local playlistViewModel: PlaylistViewModel =
     AppStorageV2.connect(PlaylistViewModel, 'PlaylistViewModel', () => new PlaylistViewModel())!;
-  @Local miniPlayerUiState: MiniPlayerUiState =
-    AppStorageV2.connect(MiniPlayerUiState, 'MiniPlayerUiState', () => new MiniPlayerUiState())!;
 
 
   /**
@@ -113,43 +112,44 @@ struct PlaylistDetail {
    */
   @Local errorMessage: string = '';
 
+  /** 隐藏式 Tabs 当前页（0=信息卡 1=播放器） */
+  @Local playerTabIndex: number = 0;
+
+  /** Tabs 切换动效（点歌/播放后跳转更柔和） */
+  @Local tabSwitchAnimProgress: number = 0;
+
+  private animateToPlayerTab(): void {
+    if (!this.hasCurrentSong()) {
+      return;
+    }
+    this.getUIContext()?.animateTo({ duration: 260, curve: Curve.EaseOut }, () => {
+      this.tabSwitchAnimProgress = 1;
+      this.playerTabIndex = 1;
+    })
+  }
+
+  private openNowPlayingFromPlayerCard(): void {
+    if (!this.hasCurrentSong()) {
+      return;
+    }
+    this.getUIContext()?.animateTo({
+      curve: curves.interpolatingSpring(0, 1, 328, 37)
+    }, () => {
+      // 不使用默认导航动画，避免叠加动画
+      this.pageInfos.pushPathByName('NowPlaying', undefined, false);
+    })
+  }
+
+  // (Removed duplicate openNowPlayingFromPlayerCard)
+
+  private hasCurrentSong(): boolean {
+    return this.playlistViewModel.currentSong !== undefined;
+  }
+
   /**
    * 搜索关键词
    */
   @Local searchKeyword: string = '';
-  private miniPlayerResumeTimerId: number = -1;
-
-  aboutToAppear(): void {
-    this.miniPlayerUiState.playlistDetailActive = true;
-    this.clearMiniPlayerVisibilityTimer();
-    this.setMiniPlayerVisibility(true);
-  }
-
-  aboutToDisappear(): void {
-    this.miniPlayerUiState.playlistDetailActive = false;
-    this.clearMiniPlayerVisibilityTimer();
-    this.setMiniPlayerVisibility(true);
-  }
-
-  private setMiniPlayerVisibility(visible: boolean): void {
-    this.miniPlayerUiState.playlistDetailVisible = visible;
-  }
-
-  private clearMiniPlayerVisibilityTimer(): void {
-    if (this.miniPlayerResumeTimerId !== -1) {
-      clearTimeout(this.miniPlayerResumeTimerId);
-      this.miniPlayerResumeTimerId = -1;
-    }
-  }
-
-  private handleSongGridScroll(): void {
-    this.setMiniPlayerVisibility(false);
-    this.clearMiniPlayerVisibilityTimer();
-    this.miniPlayerResumeTimerId = setTimeout(() => {
-      this.setMiniPlayerVisibility(true);
-      this.miniPlayerResumeTimerId = -1;
-    }, 220);
-  }
 
   /**
    * 初始化歌单基础信息
@@ -182,12 +182,6 @@ struct PlaylistDetail {
    */
   private handleSearchChange(keyword: string): void {
     this.searchKeyword = keyword;
-  }
-
-  private shouldShowFavoriteButton(): boolean {
-    return this.playlist.type === 'normal' &&
-      !this.playlist.id.toString().startsWith('key_') &&
-      this.viewModel.sources.find(source => source.id === this.playlist.sourceId)?.user?.id !== this.playlist.creator?.id;
   }
 
   /**
@@ -302,6 +296,8 @@ struct PlaylistDetail {
     this.playlistViewModel.clearPlaylist();
     this.playlistViewModel.insertSongs(this.playlist.songs ?? []);
     this.playlistViewModel.playSongByIndex(0, true);
+
+    this.animateToPlayerTab();
   }
 
   /**
@@ -375,6 +371,8 @@ struct PlaylistDetail {
     this.playlistViewModel.clearPlaylist();
     this.playlistViewModel.insertSongs(shuffle(this.playlist.songs ?? []));
     this.playlistViewModel.playSongByIndex(0, true);
+
+    this.animateToPlayerTab();
   }
 
   /**
@@ -385,6 +383,9 @@ struct PlaylistDetail {
     this.playlistViewModel.clearPlaylist();
     this.playlistViewModel.insertSongs(this.playlist.songs ?? []);
     this.playlistViewModel.playSong(song, true);
+
+    // 交互优化：点歌后自动切到播放器页
+    this.animateToPlayerTab();
   }
 
   /**
@@ -406,40 +407,72 @@ struct PlaylistDetail {
    * 大屏布局 Builder (LG断点)
    */
   @Builder
-  buildSongGrid() {
-    PlaylistSongGrid({
-      songs: this.filterSongs,
-      onSongClick: (song, index) => this.handleSongClick(song, index),
-      onSongLongPress: (song, index) => this.handleSongLongPress(song, index),
-      onScrollOffsetChange: (_offset: number) => this.handleSongGridScroll()
-    })
-  }
-
-  /**
-   * 大屏布局 Builder (LG断点)
-   */
-  @Builder
   buildLargeScreenLayout() {
     Row({ space: 20 }) {
-      Column() {
-        PlaylistInfoCard({
-          playlist: this.playlist,
-          showFavoriteButton: this.shouldShowFavoriteButton(),
-          isSubscribed: this.playlist.meta?.subscribed ?? false,
-          onPlayAll: () => this.handlePlayAll(),
-          onShuffle: () => this.handleShuffle(),
-          onToggleFavorite: () => this.handleToggleFavorite(),
-          cardHeight: 'auto',
-          coverSize: 210,
-          isVerticalLayout: false
-        })
+      Tabs({ index: this.playerTabIndex }) {
+        TabContent() {
+          Column() {
+            PlaylistInfoCard({
+              playlist: this.playlist,
+              showFavoriteButton: this.playlist.type === 'normal' && !this.playlist.id.toString().startsWith("key_") && this.viewModel.sources.find(source => source.id === this.playlist.sourceId)?.user?.id !== this.playlist.creator?.id,
+              isSubscribed: this.playlist.meta?.subscribed ?? false,
+              onPlayAll: () => this.handlePlayAll(),
+              onShuffle: () => this.handleShuffle(),
+              onToggleFavorite: () => this.handleToggleFavorite(),
+              cardHeight: 'auto',
+              coverSize: 210,
+              isVerticalLayout: false
+            })
+          }
+          .width('100%')
+          .height('100%')
+        }
+        .tabBar('')
+
+        TabContent() {
+          // 懒创建：避免 Tabs 预创建导致 PlayerCard 多实例并发挂载（订阅竞态）
+          if (this.playerTabIndex === 1 && this.hasCurrentSong()) {
+            Column({ space: 12 }) {
+              PlayerCard({
+                cardHeight: 'auto',
+                layoutMode: 'vertical',
+                coverSize: 0,
+                onOpenNowPlaying: () => {
+                  this.openNowPlayingFromPlayerCard();
+                }
+              })
+            }
+            .width('100%')
+            .height('100%')
+          } else {
+            Column() {}
+              .width('100%')
+              .height('100%')
+          }
+        }
+        .tabBar('')
       }
       .width('33.33%')
       .height('100%')
+      .barHeight(0)
+      .scrollable(this.hasCurrentSong())
+      .animationDuration(260)
+      .onChange((index: number) => {
+        this.playerTabIndex = index;
+      })
+      .onContentWillChange((currentIndex: number, comingIndex: number) => {
+        if (comingIndex === 1 && !this.hasCurrentSong()) {
+          return false;
+        }
+        return true;
+      })
+      .padding({ bottom: 24 })
 
-      Column() {
-        this.buildSongGrid()
-      }
+      PlaylistSongGrid({
+        songs: this.filterSongs,
+        onSongClick: (song, index) => this.handleSongClick(song, index),
+        onSongLongPress: (song, index) => this.handleSongLongPress(song, index)
+      })
         .layoutWeight(1)
         .height('100%')
     }
@@ -455,25 +488,69 @@ struct PlaylistDetail {
   @Builder
   buildMediumScreenLayout() {
     Row({ space: 18 }) {
-      Column() {
-        PlaylistInfoCard({
-          playlist: this.playlist,
-          showFavoriteButton: this.shouldShowFavoriteButton(),
-          isSubscribed: this.playlist.meta?.subscribed ?? false,
-          onPlayAll: () => this.handlePlayAll(),
-          onShuffle: () => this.handleShuffle(),
-          onToggleFavorite: () => this.handleToggleFavorite(),
-          cardHeight: 'auto',
-          coverSize: 190,
-          isVerticalLayout: false
-        })
+      Tabs({ index: this.playerTabIndex }) {
+        TabContent() {
+          Column() {
+            PlaylistInfoCard({
+              playlist: this.playlist,
+              isSubscribed: this.playlist.meta?.subscribed ?? false,
+              onPlayAll: () => this.handlePlayAll(),
+              onShuffle: () => this.handleShuffle(),
+              onToggleFavorite: () => this.handleToggleFavorite(),
+              cardHeight: 'auto',
+              coverSize: 190,
+              isVerticalLayout: false
+            })
+          }
+          .width('100%')
+          .height('100%')
+        }
+        .tabBar('')
+
+        TabContent() {
+          // 懒创建：避免 Tabs 预创建导致 PlayerCard 多实例并发挂载（订阅竞态）
+          if (this.playerTabIndex === 1 && this.hasCurrentSong()) {
+            Column({ space: 12 }) {
+              PlayerCard({
+                cardHeight: 'auto',
+                layoutMode: 'vertical',
+                coverSize: 0,
+                onOpenNowPlaying: () => {
+                  this.openNowPlayingFromPlayerCard();
+                }
+              })
+            }
+            .width('100%')
+            .height('100%')
+          } else {
+            Column() {}
+              .width('100%')
+              .height('100%')
+          }
+        }
+        .tabBar('')
       }
       .width('40%')
       .height('100%')
+      .barHeight(0)
+      .scrollable(this.hasCurrentSong())
+      .animationDuration(260)
+      .onChange((index: number) => {
+        this.playerTabIndex = index;
+      })
+      .onContentWillChange((currentIndex: number, comingIndex: number) => {
+        if (comingIndex === 1 && !this.hasCurrentSong()) {
+          return false;
+        }
+        return true;
+      })
+      .padding({ bottom: 20 })
 
-      Column() {
-        this.buildSongGrid()
-      }
+      PlaylistSongGrid({
+        songs: this.filterSongs,
+        onSongClick: (song, index) => this.handleSongClick(song, index),
+        onSongLongPress: (song, index) => this.handleSongLongPress(song, index)
+      })
         .layoutWeight(1)
         .height('100%')
     }
@@ -489,23 +566,59 @@ struct PlaylistDetail {
   @Builder
   buildSmallScreenLayout() {
     Column({ space: 12 }) {
-      PlaylistInfoCard({
-        playlist: this.playlist,
-        showFavoriteButton: this.shouldShowFavoriteButton(),
-        isSubscribed: this.playlist.meta?.subscribed ?? false,
-        onPlayAll: () => this.handlePlayAll(),
-        onShuffle: () => this.handleShuffle(),
-        onToggleFavorite: () => this.handleToggleFavorite(),
-        cardHeight: 230,
-        coverSize: 140,
-        isVerticalLayout: true
-      })
+      Tabs({ index: this.playerTabIndex }) {
+        TabContent() {
+          PlaylistInfoCard({
+            playlist: this.playlist,
+            isSubscribed: this.playlist.meta?.subscribed ?? false,
+            onPlayAll: () => this.handlePlayAll(),
+            onShuffle: () => this.handleShuffle(),
+            onToggleFavorite: () => this.handleToggleFavorite(),
+            cardHeight: 230,
+            coverSize: 140,
+            isVerticalLayout: true
+          })
+        }
+        .tabBar('')
+
+        TabContent() {
+          // 懒创建：避免 Tabs 预创建导致 PlayerCard 多实例并发挂载（订阅竞态）
+          if (this.playerTabIndex === 1 && this.hasCurrentSong()) {
+            PlayerCard({
+              cardHeight: 230,
+              layoutMode: 'horizontal',
+              onOpenNowPlaying: () => {
+                this.openNowPlayingFromPlayerCard();
+              }
+            })
+          } else {
+            Column() {}
+              .width('100%')
+              .height('100%')
+          }
+        }
+        .tabBar('')
+      }
       .width('100%')
       .height(230)
+      .barHeight(0)
+      .scrollable(this.hasCurrentSong())
+      .animationDuration(260)
+      .onChange((index: number) => {
+        this.playerTabIndex = index;
+      })
+      .onContentWillChange((currentIndex: number, comingIndex: number) => {
+        if (comingIndex === 1 && !this.hasCurrentSong()) {
+          return false;
+        }
+        return true;
+      })
 
-      Column() {
-        this.buildSongGrid()
-      }
+      PlaylistSongGrid({
+        songs: this.filterSongs,
+        onSongClick: (song, index) => this.handleSongClick(song, index),
+        onSongLongPress: (song, index) => this.handleSongLongPress(song, index)
+      })
         .layoutWeight(1)
     }
     .width('100%')
@@ -624,14 +737,6 @@ struct PlaylistDetail {
       .width('100%')
       .height('100%')
     }
-    .onBackPressed(() => {
-      if (this.miniPlayerUiState.isExpanded) {
-        this.miniPlayerUiState.collapseRequestVersion += 1;
-        return true;
-      }
-      this.handleBack();
-      return true;
-    })
     .mode(NavDestinationMode.STANDARD)
     .hideTitleBar(true)
     .ignoreLayoutSafeArea()
@@ -643,8 +748,6 @@ struct PlaylistDetail {
       Logger.info(TAG, `接收到路由参数: playlistId=${this.param.playlistId}, sourceId=${this.param.sourceId}`);
     })
     .onShown(() => {
-      this.miniPlayerUiState.playlistDetailActive = true;
-      this.setMiniPlayerVisibility(true);
       ContinueSwitch.setContinueData({
         page: "detail",
         id: this.param.playlistId,
@@ -654,9 +757,6 @@ struct PlaylistDetail {
       ContinueSwitch.enableContinue();
     })
     .onHidden(() => {
-      this.miniPlayerUiState.playlistDetailActive = false;
-      this.clearMiniPlayerVisibilityTimer();
-      this.setMiniPlayerVisibility(true);
       ContinueSwitch.disableContinue();
     })
   }

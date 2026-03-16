@@ -13,7 +13,6 @@ import { PlaylistDetailParam } from '../PlaylistDetail';
 import { PersistenceV2 } from '@kit.ArkUI';
 import SettingViewModel from '../../viewmodel/SettingViewModel';
 import { BreakpointConstants } from '../../common/BreakpointConstants';
-import { MiniPlayerUiState } from '../../model/MiniPlayerUiState';
 
 /**
  * 内容卡片详情页 Builder
@@ -59,11 +58,6 @@ struct ContentCardDetail {
 
   /** 系统设置 ViewModel（用于统一 UI 参数） */
   @Local settingModel: SettingViewModel = PersistenceV2.connect(SettingViewModel, 'SettingViewModel', () => new SettingViewModel())!;
-  @Local miniPlayerUiState: MiniPlayerUiState = AppStorageV2.connect(
-    MiniPlayerUiState,
-    'MiniPlayerUiState',
-    () => new MiniPlayerUiState(),
-  )!;
   /**
    * 路由参数
    */
@@ -212,14 +206,6 @@ struct ContentCardDetail {
     });
   }
 
-  aboutToAppear(): void {
-    this.miniPlayerUiState.contentCardDetailActive = true;
-  }
-
-  aboutToDisappear(): void {
-    this.miniPlayerUiState.contentCardDetailActive = false;
-  }
-
   build() {
     HdsNavDestination() {
       Stack({ alignContent: Alignment.Center }) {
@@ -257,12 +243,6 @@ struct ContentCardDetail {
     }
     .onReady((context: NavDestinationContext) => {
       this.param = (context.pathInfo.param as ContentCardDetailParam);
-    })
-    .onShown(() => {
-      this.miniPlayerUiState.contentCardDetailActive = true;
-    })
-    .onHidden(() => {
-      this.miniPlayerUiState.contentCardDetailActive = false;
     })
     .onBackPressed(() => {
       this.handleClose();

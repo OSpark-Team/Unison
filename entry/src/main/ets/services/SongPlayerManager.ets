@@ -5,7 +5,7 @@ import { emitter } from "@kit.BasicServicesKit";
 import { EmitEventConstants } from "../common/EmitEventConstants";
 import { cover, getNetworkType, parseAssetId } from "../utils/Tools";
 import { playerManager } from "./PlayerManager";
-import { AppStorageV2, PersistenceV2, promptAction } from "@kit.ArkUI";
+import { AppStorageV2, PersistenceV2 } from "@kit.ArkUI";
 import { vibrator } from "@kit.SensorServiceKit";
 import PlaylistViewModel from "../viewmodel/PlaylistViewModel";
 import SettingViewModel from "../viewmodel/SettingViewModel";

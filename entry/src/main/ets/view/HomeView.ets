@@ -20,7 +20,6 @@ import { PlaylistDetailParam } from '../pages/PlaylistDetail';
 import { emitter } from '@kit.BasicServicesKit';
 import { EmitEventConstants } from '../common/EmitEventConstants';
 import PlaylistViewModel from '../viewmodel/PlaylistViewModel';
-import { MINI_PLAYER_RESERVED_HEIGHT } from '../components/MiniPlayerShell';
 
 
 @ComponentV2
@@ -29,7 +28,6 @@ export struct HomeView {
    * 路由导航
    */
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
-  @Param onMiniPlayerVisibilityChange?: (visible: boolean) => void = undefined;
   /**
    * 窗口属性
    */
@@ -59,8 +57,6 @@ export struct HomeView {
    * ForU 颜色枚举值
    */
   private ForUColors = ["#E6593BFF", "#E6FF7A5A", "#E624CCA3", "#E6A85EFF"];
-  private scroller: Scroller = new Scroller();
-  private miniPlayerResumeTimerId: number = -1;
 
   /**
    * 选择数据源
@@ -103,42 +99,6 @@ export struct HomeView {
   aboutToAppear(): void {
     this.selectSource();
     this.initEmitListener();
-    this.clearMiniPlayerVisibilityTimer();
-    this.emitMiniPlayerVisibility(true);
-  }
-
-  aboutToDisappear(): void {
-    this.clearMiniPlayerVisibilityTimer();
-    this.emitMiniPlayerVisibility(true);
-  }
-
-  private emitMiniPlayerVisibility(visible: boolean): void {
-    if (this.onMiniPlayerVisibilityChange) {
-      this.onMiniPlayerVisibilityChange(visible);
-    }
-  }
-
-  private clearMiniPlayerVisibilityTimer(): void {
-    if (this.miniPlayerResumeTimerId !== -1) {
-      clearTimeout(this.miniPlayerResumeTimerId);
-      this.miniPlayerResumeTimerId = -1;
-    }
-  }
-
-  private updateMiniPlayerVisibility(): void {
-    this.emitMiniPlayerVisibility(false);
-    this.clearMiniPlayerVisibilityTimer();
-    this.miniPlayerResumeTimerId = setTimeout(() => {
-      this.emitMiniPlayerVisibility(true);
-      this.miniPlayerResumeTimerId = -1;
-    }, 220);
-  }
-
-  private getMiniPlayerReservedSpacing(): number {
-    if (this.playlistViewModel.currentSong) {
-      return MINI_PLAYER_RESERVED_HEIGHT + 24;
-    }
-    return 0;
   }
 
   @Builder
@@ -432,7 +392,7 @@ export struct HomeView {
   }
 
   build() {
-    Scroll(this.scroller) {
+    Scroll() {
       Column() {
         Grid() {
           Repeat<string>(this.currentSourceViewModel.items)
@@ -448,7 +408,7 @@ export struct HomeView {
         .rowsGap(16)
       }
       .margin({
-        bottom: this.windowProperties.bottomRect + this.getMiniPlayerReservedSpacing(),
+        bottom: this.windowProperties.bottomRect,
         top: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? this.windowProperties.topRect + 64 : 100,
         left: 24,
         right: 24,
@@ -456,10 +416,7 @@ export struct HomeView {
     }
     .edgeEffect(EdgeEffect.Spring)
     .scrollBar(BarState.Off)
-    .height('100%')
-    .width('100%')
-    .onDidScroll(() => {
-      this.updateMiniPlayerVisibility();
-    })
+    .height("100%")
+    .width("100%")
   }
 }

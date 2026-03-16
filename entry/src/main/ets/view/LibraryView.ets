@@ -8,8 +8,6 @@ import { cover } from '../utils/Tools';
 import { PlaylistDetailParam } from '../pages/PlaylistDetail';
 import { Source } from '../model/Source';
 import SettingViewModel from '../viewmodel/SettingViewModel';
-import PlaylistViewModel from '../viewmodel/PlaylistViewModel';
-import { MINI_PLAYER_RESERVED_HEIGHT } from '../components/MiniPlayerShell';
 
 /**
  * 音乐库视图
@@ -21,7 +19,6 @@ export struct LibraryView {
    * 路由导航
    */
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
-  @Param onMiniPlayerVisibilityChange?: (visible: boolean) => void = undefined;
   /**
    * 窗口属性
    */
@@ -40,16 +37,10 @@ export struct LibraryView {
 
   /** 系统设置 ViewModel（用于统一 UI 参数） */
   @Local settingModel: SettingViewModel = PersistenceV2.connect(SettingViewModel, 'SettingViewModel', () => new SettingViewModel())!;
-  /** 当前播放列表 */
-  @Local playlistViewModel: PlaylistViewModel =
-    AppStorageV2.connect(PlaylistViewModel, 'PlaylistViewModel', () => new PlaylistViewModel())!;
   /**
    * 搜索关键词
    */
   @Local searchKeyword: string = '';
-
-  private scroller: Scroller = new Scroller();
-  private miniPlayerResumeTimerId: number = -1;
 
   /**
    * 获取过滤后的歌单列表
@@ -105,45 +96,6 @@ export struct LibraryView {
       sourceId: playlist.sourceId,
       playlist: playlist
     } as PlaylistDetailParam, true);
-  }
-
-  aboutToAppear(): void {
-    this.clearMiniPlayerVisibilityTimer();
-    this.emitMiniPlayerVisibility(true);
-  }
-
-  aboutToDisappear(): void {
-    this.clearMiniPlayerVisibilityTimer();
-    this.emitMiniPlayerVisibility(true);
-  }
-
-  private emitMiniPlayerVisibility(visible: boolean): void {
-    if (this.onMiniPlayerVisibilityChange) {
-      this.onMiniPlayerVisibilityChange(visible);
-    }
-  }
-
-  private clearMiniPlayerVisibilityTimer(): void {
-    if (this.miniPlayerResumeTimerId !== -1) {
-      clearTimeout(this.miniPlayerResumeTimerId);
-      this.miniPlayerResumeTimerId = -1;
-    }
-  }
-
-  private updateMiniPlayerVisibility(): void {
-    this.emitMiniPlayerVisibility(false);
-    this.clearMiniPlayerVisibilityTimer();
-    this.miniPlayerResumeTimerId = setTimeout(() => {
-      this.emitMiniPlayerVisibility(true);
-      this.miniPlayerResumeTimerId = -1;
-    }, 220);
-  }
-
-  private getMiniPlayerReservedSpacing(): number {
-    if (this.playlistViewModel.currentSong) {
-      return MINI_PLAYER_RESERVED_HEIGHT + 24;
-    }
-    return 0;
   }
 
   /**
@@ -221,7 +173,6 @@ export struct LibraryView {
     .height('100%')
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
-    .padding({ bottom: this.getMiniPlayerReservedSpacing() })
   }
 
   /**
@@ -246,7 +197,7 @@ export struct LibraryView {
       .rowsGap(16)
       .layoutWeight(1)
       .margin({
-        bottom: this.windowProperties.bottomRect + this.getMiniPlayerReservedSpacing(),
+        bottom: this.windowProperties.bottomRect,
         top: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? this.windowProperties.topRect + 64 : 100,
         left: 24,
         right: 24,
@@ -255,16 +206,15 @@ export struct LibraryView {
   }
 
   build() {
-    Scroll(this.scroller) {
-      this.PlaylistGrid()
+    Column() {
+      // 歌单网格
+      Scroll() {
+        this.PlaylistGrid()
+      }
+      .align(Alignment.Top)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
     }
-    .align(Alignment.Top)
-    .scrollBar(BarState.Off)
-    .edgeEffect(EdgeEffect.Spring)
     .height('100%')
-    .width('100%')
-    .onDidScroll(() => {
-      this.updateMiniPlayerVisibility();
-    })
   }
 }

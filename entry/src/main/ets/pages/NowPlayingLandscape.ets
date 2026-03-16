@@ -16,7 +16,7 @@ import { AudioVisualizer, AudioVisualState } from "../utils/AudioVisualizer";
 import { NowPlayingLandscape as NowPlayingLandscapeContent } from "../components/NowPlayingLandscape";
 import WindowUtil from "../utils/WindowUtil";
 import { WindowProperties } from "../model/WindowProperties";
-import { MiniPlayerUiState } from "../model/MiniPlayerUiState";
+import { BreakpointConstants } from "../common/BreakpointConstants";
 
 const TAG: string = "NowPlayingLandscapePage";
 const NOW_PLAYING_LANDSCAPE_ORIENTATION_OWNER: string = "NowPlayingLandscape";
@@ -45,11 +45,6 @@ struct NowPlayingLandscapePage {
     'WindowProperties',
     () => new WindowProperties(),
   )!;
-  @Local miniPlayerUiState: MiniPlayerUiState = AppStorageV2.connect(
-    MiniPlayerUiState,
-    'MiniPlayerUiState',
-    () => new MiniPlayerUiState(),
-  )!;
 
   @Local isPlaying: boolean = false;
   @Local currentProgress: number = 0;
@@ -71,9 +66,9 @@ struct NowPlayingLandscapePage {
   private audioVisualState: AudioVisualState = new AudioVisualState();
 
   private backInProgress: boolean = false;
+  private waitTimerId: number = -1;
 
   aboutToAppear(): void {
-    this.miniPlayerUiState.nowPlayingLandscapeActive = true;
     // 进入页面即设置横屏方向，避免先渲染竖屏布局再旋转带来的树抖动
     WindowUtil.setOrientationOverride(
       NOW_PLAYING_LANDSCAPE_ORIENTATION_OWNER,
@@ -125,12 +120,15 @@ struct NowPlayingLandscapePage {
   }
 
   aboutToDisappear(): void {
-    this.miniPlayerUiState.nowPlayingLandscapeActive = false;
     playerManager.removeSubscriber("NowPlayingLandscapePage");
     this.stopProgressTimer();
     this.resetAudioReactiveState();
     this.showQueueSheet = false;
-    WindowUtil.clearOrientationOverride(NOW_PLAYING_LANDSCAPE_ORIENTATION_OWNER);
+
+    if (this.waitTimerId !== -1) {
+      clearTimeout(this.waitTimerId);
+      this.waitTimerId = -1;
+    }
   }
 
   @Computed
@@ -322,16 +320,48 @@ struct NowPlayingLandscapePage {
       NOW_PLAYING_LANDSCAPE_ORIENTATION_OWNER,
     )
       .then(
-        () => {
-          this.pageInfos.pop(false);
-          this.backInProgress = false;
-        },
+        () => this.waitForPortraitStable(800),
         (error: Error) => {
           Logger.warn(TAG, `clearOrientationOverride failed: ${error}`);
-          this.pageInfos.pop(false);
-          this.backInProgress = false;
+          return this.waitForPortraitStable(800);
         },
       )
+      .then(
+        () => {
+          this.pageInfos.pop(false);
+          finalize();
+        },
+        (error:Error) => {
+          Logger.warn(TAG, `handleBack waitForPortraitStable failed: ${error}`);
+          this.pageInfos.pop(false);
+          finalize();
+        },
+      );
+  }
+
+  private waitForPortraitStable(timeoutMs: number): Promise<void> {
+    const start = Date.now();
+    return new Promise<void>((resolve) => {
+      const check = () => {
+        const isSm = this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM;
+        const isPortrait = this.windowProperties.winHeight >= this.windowProperties.winWidth;
+        if (isSm && isPortrait) {
+          resolve();
+          return;
+        }
+
+        if (Date.now() - start >= timeoutMs) {
+          resolve();
+          return;
+        }
+
+        this.waitTimerId = setTimeout(() => {
+          check();
+        }, 16);
+      };
+
+      check();
+    });
   }
 
   @Builder
@@ -396,12 +426,6 @@ struct NowPlayingLandscapePage {
         },
       })
     }
-    .onShown(() => {
-      this.miniPlayerUiState.nowPlayingLandscapeActive = true;
-    })
-    .onHidden(() => {
-      this.miniPlayerUiState.nowPlayingLandscapeActive = false;
-    })
     .onBackPressed(() => {
       this.handleBack();
       return true;
