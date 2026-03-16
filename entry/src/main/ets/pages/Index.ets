@@ -6,12 +6,13 @@ import { LibraryView } from '../view/LibraryView';
 import { MyView } from '../view/MyView';
 import { UnisonPlusView } from '../view/UnisonPlusView';
 import { SourceListViewModel } from '../viewmodel/SourceListViewModel';
-import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit';
+import { HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import CurrentSourceViewModel from '../viewmodel/CurrentSourceViewModel';
 import { ContinueSwitch } from '../utils/Continue';
 import { PlaylistDetailParam } from './PlaylistDetail';
 import SettingViewModel from '../viewmodel/SettingViewModel';
 import { DynamicIsland } from '../components/DynamicIsland';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 @Entry
 @ComponentV2
@@ -50,6 +51,9 @@ struct Index {
    */
   @Local isDynamicIslandExpanded: boolean = false;
 
+  private  HomeViewScroller: Scroller = new Scroller(); //HomeView 滚动容器控制器
+  private  LibraryViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
+  private  MyViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
 
   /**
    /** tab栏构建器 */
@@ -173,13 +177,13 @@ struct Index {
         { top: "15%", bottom: "15%" } : 0)
     }) {
       TabContent() {
-        HomeView()
+        HomeView({scroller:this.HomeViewScroller})
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_home_title'), 0, $r('sys.symbol.house_fill'),
         $r('sys.symbol.house')))
 
       TabContent() {
-        LibraryView()
+        LibraryView({scroller:this.LibraryViewScroller})
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_library_title'), 1, $r('sys.symbol.puzzle_fill'),
         $r('sys.symbol.puzzle')))
@@ -191,7 +195,7 @@ struct Index {
         $r('sys.symbol.airplane')))
 
       TabContent() {
-        MyView()
+        MyView({scroller:this.MyViewScroller})
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_my_title'), 3, $r('sys.symbol.person_fill'),
         $r('sys.symbol.person')))
@@ -300,12 +304,37 @@ struct Index {
             mainTitle: "Unison",
           },
         },
+        style: {
+          scrollEffectOpts: {
+            enableScrollEffect: this.currentIndex!=2? true:false,
+            scrollEffectType: deviceInfo.distributionOSApiVersion >= 60100? ScrollEffectType.IMMERSIVE_GRADIENT_BLUR :ScrollEffectType.GRADIENT_BLUR,
+            blurEffectiveStartOffset: LengthMetrics.vp(0),
+            blurEffectiveEndOffset: LengthMetrics.vp(20)
+          },
+          originalStyle: {
+            backgroundStyle: {
+              backgroundColor: $r('sys.color.ohos_id_color_background'),
+            },
+            contentStyle: {
+              titleStyle: { mainTitleColor: $r('sys.color.font_primary'), subTitleColor: $r('sys.color.font_secondary') },
+              menuStyle: {
+                backgroundColor: $r('sys.color.comp_background_tertiary'),
+                iconColor: $r('sys.color.icon_primary')
+              },
+              backIconStyle: {
+                backgroundColor: $r('sys.color.comp_background_tertiary'),
+                iconColor: $r('sys.color.icon_primary')
+              }
+            }
+          }
+          },
         avoidLayoutSafeArea: true,
         padding: {
           start: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? LengthMetrics.vp(120) :
             undefined,
         },
       })
+      .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.MyViewScroller])
       .titleMode(HdsNavigationTitleMode.MINI)
       .onTouch(()=>{
         this.isDynamicIslandExpanded = false;

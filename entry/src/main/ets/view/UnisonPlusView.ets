@@ -33,6 +33,8 @@ const TAG: string = 'UnisonPlusView';
 
 @ComponentV2
 export struct UnisonPlusView {
+  // @Require @Param scroller: Scroller ;
+
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Local settingModel: SettingViewModel =
     PersistenceV2.connect(SettingViewModel, 'SettingViewModel', () => new SettingViewModel())!;

@@ -15,6 +15,7 @@ import SettingViewModel from '../viewmodel/SettingViewModel';
  */
 @ComponentV2
 export struct LibraryView {
+  @Require @Param scroller: Scroller ;
   /**
    * 路由导航
    */
@@ -208,7 +209,7 @@ export struct LibraryView {
   build() {
     Column() {
       // 歌单网格
-      Scroll() {
+      Scroll(this.scroller) {
         this.PlaylistGrid()
       }
       .align(Alignment.Top)
