@@ -63,7 +63,8 @@ struct Index {
         timeout: 1000,
         transition: (proxy: TabContentTransitionProxy) => {
           this.getUIContext().animateTo({
-            duration: 200,
+            duration: 0,
+            curve:Curve.Linear,
             onFinish: () => {
               proxy.finishTransition();
             }
