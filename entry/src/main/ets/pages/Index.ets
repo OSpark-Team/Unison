@@ -54,7 +54,7 @@ struct Index {
   private  HomeViewScroller: Scroller = new Scroller(); //HomeView 滚动容器控制器
   private  LibraryViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
   private  MyViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
-
+  private  NullScroller: Scroller = new Scroller(); //滚动容器控制器 zhanwie uniosyemian
   // 设置页面切换动画，代替滑动跳转页面动画
   private customContentTransition: (from: number, to: number) => TabContentAnimatedTransition =
     (from: number, to: number) => {
@@ -325,12 +325,11 @@ struct Index {
         },
         style: {
           scrollEffectOpts: {
-            enableScrollEffect: this.currentIndex!=2? true:false,
+            enableScrollEffect:  true,
             scrollEffectType: deviceInfo.distributionOSApiVersion >= 60100? ScrollEffectType.IMMERSIVE_GRADIENT_BLUR :ScrollEffectType.GRADIENT_BLUR,
             blurEffectiveStartOffset: LengthMetrics.vp(0),
             blurEffectiveEndOffset: LengthMetrics.vp(20)
           },
-          blurStrategy:this.currentIndex!=2? 0:1,
           },
         avoidLayoutSafeArea: true,
         padding: {
@@ -338,7 +337,7 @@ struct Index {
             undefined,
         },
       })
-      .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.MyViewScroller])
+      .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.currentIndex ===2 ?this.NullScroller:this.MyViewScroller])
       .titleMode(HdsNavigationTitleMode.MINI)
       .onTouch(()=>{
         this.isDynamicIslandExpanded = false;
