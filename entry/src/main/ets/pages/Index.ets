@@ -311,6 +311,7 @@ struct Index {
     Stack({ alignContent: Alignment.Top }) {
       HdsNavigation(this.pageInfos) {
         this.Main()
+
       }
       .height("100%")
       .width("100%")
@@ -331,6 +332,11 @@ struct Index {
             blurEffectiveStartOffset: LengthMetrics.vp(0),
             blurEffectiveEndOffset: LengthMetrics.vp(20)
           },
+          originalStyle:{
+            contentStyle:{titleStyle:{
+              mainTitleColor:$r('sys.color.font_primary')
+            }}
+          }
           },
         avoidLayoutSafeArea: true,
         padding: {
