@@ -24,6 +24,7 @@ import PlaylistViewModel from '../viewmodel/PlaylistViewModel';
 
 @ComponentV2
 export struct HomeView {
+  @Require @Param scroller: Scroller ;
   /**
    * 路由导航
    */
@@ -53,6 +54,7 @@ export struct HomeView {
    */
   @Local playlistViewModel: PlaylistViewModel =
     AppStorageV2.connect(PlaylistViewModel, 'PlaylistViewModel', () => new PlaylistViewModel())!;
+
   /**
    * ForU 颜色枚举值
    */
@@ -392,7 +394,7 @@ export struct HomeView {
   }
 
   build() {
-    Scroll() {
+    Scroll(this.scroller) {
       Column() {
         Grid() {
           Repeat<string>(this.currentSourceViewModel.items)

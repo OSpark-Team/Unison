@@ -7,6 +7,8 @@ import { OSparkLogo } from "../components/OSparkLogo";
 
 @ComponentV2
 export struct MyView {
+  @Require @Param scroller: Scroller ;
+
   /**
    * 路由导航
    */
@@ -18,7 +20,7 @@ export struct MyView {
     AppStorageV2.connect(WindowProperties, "WindowProperties", () => new WindowProperties())!;
 
   build() {
-    Scroll() {
+    Scroll(this.scroller) {
       Column() {
         // 数据源管理区域
         SourceManagementView()

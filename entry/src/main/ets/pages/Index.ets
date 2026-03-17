@@ -6,12 +6,13 @@ import { LibraryView } from '../view/LibraryView';
 import { MyView } from '../view/MyView';
 import { UnisonPlusView } from '../view/UnisonPlusView';
 import { SourceListViewModel } from '../viewmodel/SourceListViewModel';
-import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit';
+import { HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import CurrentSourceViewModel from '../viewmodel/CurrentSourceViewModel';
 import { ContinueSwitch } from '../utils/Continue';
 import { PlaylistDetailParam } from './PlaylistDetail';
 import SettingViewModel from '../viewmodel/SettingViewModel';
 import { DynamicIsland } from '../components/DynamicIsland';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 @Entry
 @ComponentV2
@@ -50,7 +51,29 @@ struct Index {
    */
   @Local isDynamicIslandExpanded: boolean = false;
 
-
+  private  HomeViewScroller: Scroller = new Scroller(); //HomeView 滚动容器控制器
+  private  LibraryViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
+  private  MyViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
+  private  NullScroller: Scroller = new Scroller(); //滚动容器控制器 zhanwie uniosyemian
+  // 设置页面切换动画，代替滑动跳转页面动画
+  private customContentTransition: (from: number, to: number) => TabContentAnimatedTransition =
+    (from: number, to: number) => {
+      console.info(`from ${from} to ${to}`);
+      let tabContentAnimatedTransition = {
+        timeout: 1000,
+        transition: (proxy: TabContentTransitionProxy) => {
+          this.getUIContext().animateTo({
+            duration: 0,
+            curve:Curve.Linear,
+            onFinish: () => {
+              proxy.finishTransition();
+            }
+          }, () => {
+          });
+        }
+      } as TabContentAnimatedTransition;
+      return tabContentAnimatedTransition;
+    };
   /**
    /** tab栏构建器 */
   @Builder
@@ -173,13 +196,13 @@ struct Index {
         { top: "15%", bottom: "15%" } : 0)
     }) {
       TabContent() {
-        HomeView()
+        HomeView({scroller:this.HomeViewScroller})
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_home_title'), 0, $r('sys.symbol.house_fill'),
         $r('sys.symbol.house')))
 
       TabContent() {
-        LibraryView()
+        LibraryView({scroller:this.LibraryViewScroller})
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_library_title'), 1, $r('sys.symbol.puzzle_fill'),
         $r('sys.symbol.puzzle')))
@@ -191,7 +214,7 @@ struct Index {
         $r('sys.symbol.airplane')))
 
       TabContent() {
-        MyView()
+        MyView({scroller:this.MyViewScroller})
       }
       .tabBar(this.tabBuilder($r('app.string.toolbar_my_title'), 3, $r('sys.symbol.person_fill'),
         $r('sys.symbol.person')))
@@ -213,6 +236,7 @@ struct Index {
       }
       return true;
     })
+    .customContentTransition(this.customContentTransition)
     .barHeight(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
       this.windowProperties.bottomRect + 48 : undefined)
     .barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : undefined)
@@ -287,6 +311,7 @@ struct Index {
     Stack({ alignContent: Alignment.Top }) {
       HdsNavigation(this.pageInfos) {
         this.Main()
+
       }
       .height("100%")
       .width("100%")
@@ -300,12 +325,26 @@ struct Index {
             mainTitle: "Unison",
           },
         },
+        style: {
+          scrollEffectOpts: {
+            enableScrollEffect:  true,
+            scrollEffectType: deviceInfo.distributionOSApiVersion >= 60100? ScrollEffectType.IMMERSIVE_GRADIENT_BLUR :ScrollEffectType.GRADIENT_BLUR,
+            blurEffectiveStartOffset: LengthMetrics.vp(0),
+            blurEffectiveEndOffset: LengthMetrics.vp(20)
+          },
+          originalStyle:{
+            contentStyle:{titleStyle:{
+              mainTitleColor:$r('sys.color.font_primary')
+            }}
+          }
+          },
         avoidLayoutSafeArea: true,
         padding: {
           start: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? LengthMetrics.vp(120) :
             undefined,
         },
       })
+      .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.currentIndex ===2 ?this.NullScroller:this.MyViewScroller])
       .titleMode(HdsNavigationTitleMode.MINI)
       .onTouch(()=>{
         this.isDynamicIslandExpanded = false;
