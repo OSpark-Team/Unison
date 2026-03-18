@@ -8,6 +8,7 @@ import { cover } from '../utils/Tools';
 import { PlaylistDetailParam } from '../pages/PlaylistDetail';
 import { Source } from '../model/Source';
 import SettingViewModel from '../viewmodel/SettingViewModel';
+import TabSettingModel from '../model/adapter/TabSetting';
 
 /**
  * 音乐库视图
@@ -38,6 +39,8 @@ export struct LibraryView {
 
   /** 系统设置 ViewModel（用于统一 UI 参数） */
   @Local settingModel: SettingViewModel = PersistenceV2.connect(SettingViewModel, 'SettingViewModel', () => new SettingViewModel())!;
+  /** Tab样式设置 ViewModel（用于统一 UI 参数） */
+  @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
   /**
    * 搜索关键词
    */
@@ -211,7 +214,8 @@ export struct LibraryView {
       // 歌单网格
       Scroll(this.scroller) {
         this.PlaylistGrid()
-      }
+
+      }.contentEndOffset(this.TabSettingModel.barFloatingStyle?72:0)
       .align(Alignment.Top)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)

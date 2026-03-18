@@ -39,10 +39,13 @@ export struct SettingItem {
   build() {
     Column({ space: 0 }) {
       Row({ space: 12 }) {
-        // 左侧图标
-        SymbolGlyph(this.icon)
-          .fontSize(24)
-          .fontColor([$r('app.color.text_secondary')])
+        if (this.icon!=undefined){
+          // 左侧图标
+          SymbolGlyph(this.icon)
+            .fontSize(24)
+            .fontColor([$r('app.color.text_secondary')])
+        }
+
 
         // 中间文本（标题 + 描述）
         Column({ space: 4 }) {

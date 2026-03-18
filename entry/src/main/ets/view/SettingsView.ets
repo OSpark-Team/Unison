@@ -9,6 +9,7 @@ import { PersistenceV2 } from '@kit.ArkUI';
 import { bundleManager } from '@kit.AbilityKit';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import hilog from '@ohos.hilog';
+import hdsTabSettingCom from '../components/TabSettingcom';
 
 const TAG = 'SettingsView';
 const DOMAIN: number = 0xFF02;
@@ -419,6 +420,7 @@ export struct SettingsView {
           .width('100%')
           .backgroundColor($r('app.color.background_card'))
           .borderRadius(16)
+
         }
         .width('100%')
         .padding({ left: 16, right: 16, top: 8, bottom: 32 })
@@ -585,7 +587,29 @@ export struct SettingsView {
     .justifyContent(FlexAlign.Start)
     .backgroundColor($r('app.color.background_primary'));
   }
+  @Builder
+  private buildPersonalSetting(){
+    Column(){
+      this.buildSheetHeader('个性化设置')
+      Divider()
+        .strokeWidth(1)
+        .color($r('app.color.divider'));
+      Scroll() {
 
+        hdsTabSettingCom()
+
+      }
+      .padding({ left: 16, right: 16, top: 8, bottom: 32 })
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .layoutWeight(1)
+      .align(Alignment.Top)
+    }    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Start)
+    .backgroundColor($r('app.color.background_primary'));
+
+  }
   @Builder
   private buildPlaybackNetworkOption(value: 'wifi-only' | 'both', title: ResourceStr) {
     Row({ space: 12 }) {
@@ -883,6 +907,8 @@ export struct SettingsView {
       this.buildByokSheet();
     } else if (this.sheetType === 'feedback') {
       this.buildFeedbackSheet();
+    }else if (this.sheetType === 'personalSetting') {
+      this.buildPersonalSetting();
     } else {
       Column() {}
       .width('100%')
@@ -909,7 +935,16 @@ export struct SettingsView {
             this.openSheet('theme');
           }
         })
-
+        SettingItem({
+          type: 'navigation',
+          icon: $r('sys.symbol.paintbrush'),
+          title: '个性化设置',
+          description: '随心所欲',
+          isLast: false,
+          onItemClick: () => {
+            this.openSheet('personalSetting');
+          }
+        })
         SettingItem({
           type: 'navigation',
           icon: $r('sys.symbol.textformat'),

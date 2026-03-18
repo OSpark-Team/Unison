@@ -1,9 +1,10 @@
 import { WindowProperties } from "../model/WindowProperties";
 import { SettingsView } from "./SettingsView"
 import { SourceManagementView } from "./SourceManagementView"
-import { AppStorageV2 } from "@kit.ArkUI";
+import { AppStorageV2, PersistenceV2 } from "@kit.ArkUI";
 import { BreakpointConstants } from "../common/BreakpointConstants";
 import { OSparkLogo } from "../components/OSparkLogo";
+import TabSettingModel from "../model/adapter/TabSetting";
 
 @ComponentV2
 export struct MyView {
@@ -18,7 +19,8 @@ export struct MyView {
    */
   @Local windowProperties: WindowProperties =
     AppStorageV2.connect(WindowProperties, "WindowProperties", () => new WindowProperties())!;
-
+  /** Tab样式设置 ViewModel（用于统一 UI 参数） */
+  @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
   build() {
     Scroll(this.scroller) {
       Column() {
@@ -44,6 +46,7 @@ export struct MyView {
         right: 24,
       })
     }
+    .contentEndOffset(this.TabSettingModel.barFloatingStyle?72:0)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
     .align(Alignment.Top)

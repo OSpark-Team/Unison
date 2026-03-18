@@ -7,6 +7,7 @@ import { Album } from '../model/adapter/Album';
 import { Artist } from '../model/adapter/Artist';
 import { Playlist } from '../model/adapter/Playlist';
 import { Song } from '../model/adapter/Song';
+import TabSettingModel from '../model/adapter/TabSetting';
 import { Source } from '../model/Source';
 import { WindowProperties } from '../model/WindowProperties';
 import { PlaylistDetailParam } from '../pages/PlaylistDetail';
@@ -44,6 +45,8 @@ export struct UnisonPlusView {
     AppStorageV2.connect(SourceListViewModel, 'SourceListViewModel', () => new SourceListViewModel())!;
   @Local playlistViewModel: PlaylistViewModel =
     AppStorageV2.connect(PlaylistViewModel, 'PlaylistViewModel', () => new PlaylistViewModel())!;
+  /** Tab样式设置 ViewModel（用于统一 UI 参数） */
+  @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
   @Local messages: UnisonDisplayMessage[] = [];
   @Local renderMessages: UnisonDisplayMessage[] = [];
   @Local inputText: string = '';
@@ -1197,7 +1200,7 @@ export struct UnisonPlusView {
       .backgroundColor($r('app.color.background_primary'))
     }
     .margin({
-      bottom: this.windowProperties.bottomRect,
+      bottom: this.windowProperties.bottomRect +(this.TabSettingModel.barFloatingStyle?72:0),
       top: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? this.windowProperties.topRect + 64 : 100,
       left: 24,
       right: 24,
