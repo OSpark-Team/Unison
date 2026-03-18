@@ -359,8 +359,8 @@ struct Index {
           },
         avoidLayoutSafeArea: true,
         padding: {
-          start: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? LengthMetrics.vp(120) :
-            undefined,
+          start:this.TabSettingModel.barFloatingStyle? undefined:(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? LengthMetrics.vp(120) :
+            undefined) ,
         },
       })
       .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.currentIndex ===2 ?this.NullScroller:this.MyViewScroller])
