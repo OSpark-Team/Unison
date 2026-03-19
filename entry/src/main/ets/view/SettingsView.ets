@@ -1055,13 +1055,7 @@ export struct SettingsView {
       height: SheetSize.LARGE,
       showClose: false,
       preferType: SheetType.CENTER,
-      // onWillDismiss: ()=>{
-      //   this.showSheet = false;
-      // },
-      // onWillDisappear:()=>{
-      //   this.showSheet = false;
-      //
-      // }
+
     });
   }
 }
