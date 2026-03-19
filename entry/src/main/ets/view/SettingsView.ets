@@ -1051,13 +1051,17 @@ export struct SettingsView {
       this.buildSettingsArea();
     }
     .width('100%')
-    .bindSheet($$this.showSheet, this.buildDynamicSheet(), {
+    .bindSheet(!!this.showSheet, this.buildDynamicSheet(), {
       height: SheetSize.LARGE,
       showClose: false,
       preferType: SheetType.CENTER,
-      onWillDismiss: ()=>{
-        this.showSheet = false;
-      }
+      // onWillDismiss: ()=>{
+      //   this.showSheet = false;
+      // },
+      // onWillDisappear:()=>{
+      //   this.showSheet = false;
+      //
+      // }
     });
   }
 }
