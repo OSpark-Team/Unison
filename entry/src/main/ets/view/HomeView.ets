@@ -20,6 +20,7 @@ import { PlaylistDetailParam } from '../pages/PlaylistDetail';
 import { emitter } from '@kit.BasicServicesKit';
 import { EmitEventConstants } from '../common/EmitEventConstants';
 import PlaylistViewModel from '../viewmodel/PlaylistViewModel';
+import TabSettingModel from '../model/adapter/TabSetting';
 
 
 @ComponentV2
@@ -54,7 +55,7 @@ export struct HomeView {
    */
   @Local playlistViewModel: PlaylistViewModel =
     AppStorageV2.connect(PlaylistViewModel, 'PlaylistViewModel', () => new PlaylistViewModel())!;
-
+  @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
   /**
    * ForU 颜色枚举值
    */
@@ -417,6 +418,7 @@ export struct HomeView {
       })
     }
     .edgeEffect(EdgeEffect.Spring)
+    .contentEndOffset(this.TabSettingModel.barFloatingStyle?72:0)
     .scrollBar(BarState.Off)
     .height("100%")
     .width("100%")

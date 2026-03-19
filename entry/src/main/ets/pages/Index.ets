@@ -6,13 +6,15 @@ import { LibraryView } from '../view/LibraryView';
 import { MyView } from '../view/MyView';
 import { UnisonPlusView } from '../view/UnisonPlusView';
 import { SourceListViewModel } from '../viewmodel/SourceListViewModel';
-import { HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
+import {HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit';
 import CurrentSourceViewModel from '../viewmodel/CurrentSourceViewModel';
 import { ContinueSwitch } from '../utils/Continue';
 import { PlaylistDetailParam } from './PlaylistDetail';
 import SettingViewModel from '../viewmodel/SettingViewModel';
 import { DynamicIsland } from '../components/DynamicIsland';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { HdsTabs, HdsTabsAttribute, HdsTabsController } from '@kit.UIDesignKit';
+import TabSettingModel from '../model/adapter/TabSetting';
 
 @Entry
 @ComponentV2
@@ -22,7 +24,7 @@ struct Index {
   /** 当前tab索引 */
   @Local currentIndex: number = 0;
   /** tab控制器 */
-  @Local controller: TabsController = new TabsController();
+  @Local controller: HdsTabsController = new HdsTabsController();
   /**
    * 窗口属性
    */
@@ -41,6 +43,12 @@ struct Index {
    */
   @Local sourceListViewModel: SourceListViewModel =
     AppStorageV2.connect(SourceListViewModel, 'SourceListViewModel', () => new SourceListViewModel())!;
+  @Local HdsTabModifier: AttributeModifier<HdsTabsAttribute> | undefined = undefined
+  @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
+  @Monitor('TabSettingModel.barFloatingStyle')
+  HdsTabModifierChange(){
+
+  }
   /**
    * 是否显示灵动岛
    */
@@ -51,34 +59,36 @@ struct Index {
    */
   @Local isDynamicIslandExpanded: boolean = false;
 
+
   private  HomeViewScroller: Scroller = new Scroller(); //HomeView 滚动容器控制器
   private  LibraryViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
   private  MyViewScroller: Scroller = new Scroller(); //LibraryView 滚动容器控制器
   private  NullScroller: Scroller = new Scroller(); //滚动容器控制器 zhanwie uniosyemian
+
   // 设置页面切换动画，代替滑动跳转页面动画
-  private customContentTransition: (from: number, to: number) => TabContentAnimatedTransition =
-    (from: number, to: number) => {
-      console.info(`from ${from} to ${to}`);
-      let tabContentAnimatedTransition = {
-        timeout: 1000,
-        transition: (proxy: TabContentTransitionProxy) => {
-          this.getUIContext().animateTo({
-            duration: 0,
-            curve:Curve.Linear,
-            onFinish: () => {
-              proxy.finishTransition();
-            }
-          }, () => {
-          });
-        }
-      } as TabContentAnimatedTransition;
-      return tabContentAnimatedTransition;
-    };
+  // private customContentTransition: (from: number, to: number) => TabContentAnimatedTransition =
+  //   (from: number, to: number) => {
+  //     console.info(`from ${from} to ${to}`);
+  //     let tabContentAnimatedTransition = {
+  //       timeout: 1000,
+  //       transition: (proxy: TabContentTransitionProxy) => {
+  //         this.getUIContext().animateTo({
+  //           duration: 0,
+  //           curve:Curve.Linear,
+  //           onFinish: () => {
+  //             proxy.finishTransition();
+  //           }
+  //         }, () => {
+  //         });
+  //       }
+  //     } as TabContentAnimatedTransition;
+  //     return tabContentAnimatedTransition;
+  //   };
   /**
    /** tab栏构建器 */
   @Builder
   tabBuilder(title: ResourceStr, targetIndex: number, selectedImg: Resource, normalImg: Resource) {
-    Column({ space: 6 }) {
+    Column({ space: 3 }) {
       SymbolGlyph(this.currentIndex === targetIndex ? selectedImg : normalImg)
         .fontSize(25)
         .renderingStrategy(SymbolRenderingStrategy.SINGLE)
@@ -100,7 +110,7 @@ struct Index {
         this.currentIndex = targetIndex
       })
     })
-    .margin({
+    .margin(this.TabSettingModel.barFloatingStyle?0:{
       bottom: this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
         this.windowProperties.bottomRect / 2 : 0
     })
@@ -189,12 +199,14 @@ struct Index {
    */
   @Builder
   Main() {
-    Tabs({
+    HdsTabs({
       controller: this.controller,
       barModifier: new CommonModifier().padding(this.windowProperties.currentBreakpoint !==
       BreakpointConstants.BREAKPOINT_SM ?
-        { top: "15%", bottom: "15%" } : 0)
-    }) {
+        { top: "15%", bottom: "15%" } : 0),
+      index:this.currentIndex
+    })
+    {
       TabContent() {
         HomeView({scroller:this.HomeViewScroller})
       }
@@ -224,10 +236,10 @@ struct Index {
       curve: Curve.Friction,
     })
     .scrollable(false)
-    .divider({
-      strokeWidth: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 1 : 0,
-      color: $r('app.color.divider')
-    })
+    // .divider({
+    //   strokeWidth: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 1 : 0,
+    //   color: $r('app.color.divider')
+    // })
     .onContentWillChange((currentIndex: number, comingIndex: number) => {
       this.currentIndex = comingIndex;
       if (this.currentIndex === 1) {
@@ -236,18 +248,25 @@ struct Index {
       }
       return true;
     })
-    .customContentTransition(this.customContentTransition)
-    .barHeight(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
-      this.windowProperties.bottomRect + 48 : undefined)
-    .barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : undefined)
-    .barPosition(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
-      BarPosition.Start)
-    .vertical(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
+    .barOverlap(this.TabSettingModel.barFloatingStyle)
+    .attributeModifier(this.HdsTabModifier)
+    .barPosition(this.TabSettingModel.barFloatingStyle?BarPosition.End:(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
+      BarPosition.Start))
+
+    .barHeight(this.TabSettingModel.barFloatingStyle? 64:(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
+      this.windowProperties.bottomRect + 48  : '100%'))
+    .barWidth(this.TabSettingModel.barFloatingStyle?(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 400 : 300):(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%'))
+     //    .barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%')
+     // .barPosition(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
+     //      BarPosition.Start)
+        .vertical(this.TabSettingModel.barFloatingStyle? false:this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
+.animationDuration(0)
     .width('100%')
     .height('100%')
   }
 
   aboutToAppear() {
+
     // 获取接续数据
     const continueData = ContinueSwitch.getContinueData();
     if (continueData) {
@@ -279,6 +298,7 @@ struct Index {
         }
       }
     });
+
   }
 
   @Builder
@@ -340,8 +360,8 @@ struct Index {
           },
         avoidLayoutSafeArea: true,
         padding: {
-          start: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? LengthMetrics.vp(120) :
-            undefined,
+          start:this.TabSettingModel.barFloatingStyle? undefined:(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? LengthMetrics.vp(120) :
+            undefined) ,
         },
       })
       .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.currentIndex ===2 ?this.NullScroller:this.MyViewScroller])
@@ -349,7 +369,25 @@ struct Index {
       .onTouch(()=>{
         this.isDynamicIslandExpanded = false;
       })
+      .onAppear(()=>{
+        if (deviceInfo.distributionOSApiVersion >= 60100){
+          import('../Modifer/hdsTabModeifier').then((model)=>{
+            this.HdsTabModifier = new model.hdsTabModifier
+          })
+        }else {
 
+          // this.HdsTabModifier = {
+          //   applyNormalAttribute(instance: HdsTabsAttribute){
+          //     instance.barHeight( this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
+          //       this.windowProperties.bottomRect + 48  : '100%')
+          //     instance.barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%')
+          //     instance.barPosition(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
+          //       BarPosition.Start)
+          //     instance.vertical(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
+          //
+          //   }}
+        }
+      })
 
       this.buildFloatingDynamicIsland()
     }

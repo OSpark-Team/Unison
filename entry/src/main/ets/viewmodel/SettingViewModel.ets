@@ -145,3 +145,6 @@ export default class SettingViewModel {
     return this.byokApiKey.trim() !== "" && this.byokApiBase.trim() !== "" && this.byokApiModel.trim() !== "";
   }
 }
+
+
+
