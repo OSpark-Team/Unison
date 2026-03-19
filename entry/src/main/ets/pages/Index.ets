@@ -260,7 +260,7 @@ struct Index {
      // .barPosition(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
      //      BarPosition.Start)
         .vertical(this.TabSettingModel.barFloatingStyle? false:this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
-
+.animationDuration(0)
     .width('100%')
     .height('100%')
   }

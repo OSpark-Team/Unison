@@ -5,12 +5,8 @@ import TabSettingModel from "../model/adapter/TabSetting";
 
  @ObservedV2
 export class hdsTabModifier implements AttributeModifier<HdsTabsAttribute> {
-  public isbarFloatingStyle: boolean = true
   private TabSettingModels: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
-  @Monitor('TabSettingModels.barFloatingStyle')
-  change(){
-    this.isbarFloatingStyle = this.TabSettingModels.barFloatingStyle
-  }
+
   applyNormalAttribute(instance: HdsTabsAttribute){
 
     if (deviceInfo.distributionOSApiVersion >= 60100) {

@@ -10,5 +10,5 @@ export default   class TabSettingModel{
   @Trace barFloatingStyle:boolean = false;
   @Trace TabMaterial:number = 100;
   @Trace TabMaterialLevel:number = 10;
-
+  @Trace backgroundColor:ResourceStr = ''
 }
