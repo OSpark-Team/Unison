@@ -203,7 +203,8 @@ struct Index {
       controller: this.controller,
       barModifier: new CommonModifier().padding(this.windowProperties.currentBreakpoint !==
       BreakpointConstants.BREAKPOINT_SM ?
-        { top: "15%", bottom: "15%" } : 0)
+        { top: "15%", bottom: "15%" } : 0),
+      index:this.currentIndex
     })
     {
       TabContent() {
