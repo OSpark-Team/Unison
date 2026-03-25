@@ -1,6 +1,7 @@
 import { avSession } from '@kit.AVSessionKit';
 import { common } from '@kit.AbilityKit';
 import Logger from '../utils/Logger';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 const TAG = 'AVSessionManager';
 
@@ -69,6 +70,9 @@ export class AVSessionManager {
       await this.syncLoopMode(avSession.LoopMode.LOOP_MODE_LIST);
 
       this.registerSessionListeners();
+      if (deviceInfo.sdkApiVersion>22) {
+        this.session.enableDesktopLyric(true)
+      }
       Logger.info(TAG, 'init', 'AVSession successfully created and activated.');
     } catch (error) {
       Logger.error(TAG, 'init', `Failed to create AVSession: ${JSON.stringify(error)}`);
@@ -93,7 +97,9 @@ export class AVSessionManager {
       Logger.error(TAG, 'destroy', `Failed: ${JSON.stringify(error)}`);
     }
   }
-
+  // public setdesktopLyric(judge:boolean){
+  //   this.session?.setDesktopLyricVisible(judge)
+  // }
   // ── 多订阅者管理 ──────────────────────────────────────────────────────────
 
   /**
