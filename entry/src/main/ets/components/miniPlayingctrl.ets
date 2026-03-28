@@ -1,6 +1,6 @@
 import { HdsTabs } from "@hms.hds.hdsBaseComponent";
 import { hdsMaterial } from "@kit.UIDesignKit";
-import TabSettingModel from "../model/adapter/TabSetting";
+import TabSettingModel, { isPlaying } from "../model/adapter/TabSetting";
 import { AppStorageV2, PersistenceV2 } from "@kit.ArkUI";
 import PlaylistViewModel from "../viewmodel/PlaylistViewModel";
 import { cover } from "../utils/Tools";
@@ -15,38 +15,24 @@ export  struct  miniPlayingCtrl{
     "PlaylistViewModel",
     () => new PlaylistViewModel(),
   )!;
-  @Local isPlaying:boolean = false
+  @Local  IsPlaying: isPlaying = AppStorageV2.connect(
+    isPlaying,
+    "isPlaying",
+    () => new isPlaying(),
+  )!;
 
   private playNext(): void {
     const next = this.playlistViewModel.nextSong(true);
     if (next) this.playlistViewModel.playSong(next, true);
   }
   private togglePlayPause(): void {
-    if (this.isPlaying) {
+    if (this.IsPlaying.isPlaying) {
       playerManager.pause();
     } else {
       songPlayerManager.playCurrentSongOrResume();
     }
   }
-  aboutToAppear(): void {
-    const callbacks: PlayerCallbacks = {
-      onPlay: () => {
-        this.isPlaying = true;
 
-      },
-      onPause: () => {
-        this.isPlaying = false;
-;
-      },
-      onStop: () => {
-        this.isPlaying = false;
-
-      },
-    };
-
-    playerManager.addSubscriber("NowPlayingPage", callbacks);
-    this.isPlaying = playerManager.isPlaying();
-  }
   @Builder
   miniPlay(){
     Row(){
@@ -67,7 +53,7 @@ export  struct  miniPlayingCtrl{
         .layoutWeight(1)
         .maxLines(1)
         .textOverflow({overflow:TextOverflow.MARQUEE})
-      SymbolGlyph(this.isPlaying ? $r("sys.symbol.pause_fill") : $r("sys.symbol.play_fill")).fontColor([$r('sys.color.font')])
+      SymbolGlyph(this.IsPlaying.isPlaying ? $r("sys.symbol.pause_fill") : $r("sys.symbol.play_fill")).fontColor([$r('sys.color.font')])
         .width(32)
         .onClick(()=>{
           this.togglePlayPause()
