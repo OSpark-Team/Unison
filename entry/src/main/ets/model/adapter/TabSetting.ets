@@ -18,4 +18,10 @@ export default class TabSettingModel {
 
   // Tab栏背景颜色，支持资源字符串类型（如颜色资源引用或十六进制颜色值）
   @Trace backgroundColor: ResourceStr = ''
+
+}
+
+@ObservedV2
+export  class isPlaying {
+  @Trace isPlaying:boolean =false
 }

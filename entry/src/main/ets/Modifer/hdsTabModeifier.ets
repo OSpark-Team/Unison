@@ -17,7 +17,9 @@ export class hdsTabModifier implements AttributeModifier<HdsTabsAttribute> {
         instance.barFloatingStyle({
           barWidth: { smallWidth: 300, mediumWidth: 400, largeWidth: 500 },
           barBottomMargin: 28,
-          // gradientMask: { maskColor: '#66F1F3F5', maskHeight: 92 },
+          // gradientMask: { maskColor: '#66F1F3F5', maskHeight: 0 },
+          gradientMask: { maskColor: '#00000000', maskHeight: 20 },
+
           systemMaterialEffect: {
             materialType: this.TabSettingModels.TabMaterial,
             materialLevel: this.TabSettingModels.TabMaterialLevel

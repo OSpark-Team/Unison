@@ -15,6 +15,7 @@ import { DynamicIsland } from '../components/DynamicIsland';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { HdsTabs, HdsTabsAttribute, HdsTabsController } from '@kit.UIDesignKit';
 import TabSettingModel from '../model/adapter/TabSetting';
+import { miniPlayingCtrl } from '../components/miniPlayingctrl';
 
 @Entry
 @ComponentV2
@@ -199,70 +200,83 @@ struct Index {
    */
   @Builder
   Main() {
-    HdsTabs({
-      controller: this.controller,
-      barModifier: new CommonModifier().padding(this.windowProperties.currentBreakpoint !==
-      BreakpointConstants.BREAKPOINT_SM ?
-        { top: "15%", bottom: "15%" } : 0),
-      index:this.currentIndex
-    })
-    {
-      TabContent() {
-        HomeView({scroller:this.HomeViewScroller})
-      }
-      .tabBar(this.tabBuilder($r('app.string.toolbar_home_title'), 0, $r('sys.symbol.house_fill'),
-        $r('sys.symbol.house')))
 
-      TabContent() {
-        LibraryView({scroller:this.LibraryViewScroller})
-      }
-      .tabBar(this.tabBuilder($r('app.string.toolbar_library_title'), 1, $r('sys.symbol.puzzle_fill'),
-        $r('sys.symbol.puzzle')))
+      Stack(){
+        HdsTabs({
+          controller: this.controller,
+          barModifier: new CommonModifier().padding(this.windowProperties.currentBreakpoint !==
+            BreakpointConstants.BREAKPOINT_SM ?
+            { top: "15%", bottom: "15%" } : 0),
+          index:this.currentIndex
+        })
+        {
+          TabContent() {
+            HomeView({scroller:this.HomeViewScroller})
+          }
+          .tabBar(this.tabBuilder($r('app.string.toolbar_home_title'), 0, $r('sys.symbol.house_fill'),
+            $r('sys.symbol.house')))
 
-      TabContent() {
-        UnisonPlusView()
-      }
-      .tabBar(this.tabBuilder($r('app.string.toolbar_ai_title'), 2, $r('sys.symbol.airplane_fill'),
-        $r('sys.symbol.airplane')))
+          TabContent() {
+            LibraryView({scroller:this.LibraryViewScroller})
+          }
+          .tabBar(this.tabBuilder($r('app.string.toolbar_library_title'), 1, $r('sys.symbol.puzzle_fill'),
+            $r('sys.symbol.puzzle')))
 
-      TabContent() {
-        MyView({scroller:this.MyViewScroller})
-      }
-      .tabBar(this.tabBuilder($r('app.string.toolbar_my_title'), 3, $r('sys.symbol.person_fill'),
-        $r('sys.symbol.person')))
-    }
-    .animation({
-      duration: 400,
-      curve: Curve.Friction,
-    })
-    .scrollable(false)
-    // .divider({
-    //   strokeWidth: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 1 : 0,
-    //   color: $r('app.color.divider')
-    // })
-    .onContentWillChange((currentIndex: number, comingIndex: number) => {
-      this.currentIndex = comingIndex;
-      if (this.currentIndex === 1) {
-        // 拉取最新数据
-        this.currentSourceViewModel.refreshUserPlaylists()
-      }
-      return true;
-    })
-    .barOverlap(this.TabSettingModel.barFloatingStyle)
-    .attributeModifier(this.HdsTabModifier)
-    .barPosition(this.TabSettingModel.barFloatingStyle?BarPosition.End:(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
-      BarPosition.Start))
+          TabContent() {
+            UnisonPlusView()
+          }
+          .tabBar(this.tabBuilder($r('app.string.toolbar_ai_title'), 2, $r('sys.symbol.airplane_fill'),
+            $r('sys.symbol.airplane')))
 
-    .barHeight(this.TabSettingModel.barFloatingStyle? 64:(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
-      this.windowProperties.bottomRect + 48  : '100%'))
-    .barWidth(this.TabSettingModel.barFloatingStyle?(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 400 : 300):(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%'))
-     //    .barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%')
-     // .barPosition(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
-     //      BarPosition.Start)
+          TabContent() {
+            MyView({scroller:this.MyViewScroller})
+          }
+          .tabBar(this.tabBuilder($r('app.string.toolbar_my_title'), 3, $r('sys.symbol.person_fill'),
+            $r('sys.symbol.person')))
+        }
+        .animation({
+          duration: 400,
+          curve: Curve.Friction,
+        })
+        .scrollable(false)
+        // .divider({
+        //   strokeWidth: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 1 : 0,
+        //   color: $r('app.color.divider')
+        // })
+        .onContentWillChange((currentIndex: number, comingIndex: number) => {
+          this.currentIndex = comingIndex;
+          if (this.currentIndex === 1) {
+            // 拉取最新数据
+            this.currentSourceViewModel.refreshUserPlaylists()
+          }
+          return true;
+        })
+        .barOverlap(this.TabSettingModel.barFloatingStyle)
+        .attributeModifier(this.HdsTabModifier)
+        .barPosition(this.TabSettingModel.barFloatingStyle?BarPosition.End:(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
+          BarPosition.Start))
+
+        .barHeight(this.TabSettingModel.barFloatingStyle? 64:(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
+          this.windowProperties.bottomRect + 48  : '100%'))
+        .barWidth(this.TabSettingModel.barFloatingStyle?(this.windowProperties.currentBreakpoint == BreakpointConstants.BREAKPOINT_MD ? 400 :this.windowProperties.currentBreakpoint == BreakpointConstants.BREAKPOINT_LG? 500: 300):(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%'))
+
+        //    .barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%')
+        // .barPosition(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
+        //      BarPosition.Start)
         .vertical(this.TabSettingModel.barFloatingStyle? false:this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
-  .animationDuration(0)
-    .width('100%')
-    .height('100%')
+        .animationDuration(0)
+        .width('100%')
+        .height('100%')
+        if (this.TabSettingModel.barFloatingStyle){
+        Column(){
+          miniPlayingCtrl()
+        } .height(48+10).margin({bottom:64+6+28})}
+
+
+
+      }.align(Alignment.Bottom)
+
+
   }
 
   aboutToAppear() {
@@ -298,7 +312,11 @@ struct Index {
         }
       }
     });
-
+    if (deviceInfo.distributionOSApiVersion >= 60100){
+      import('../Modifer/hdsTabModeifier').then((model)=>{
+        this.HdsTabModifier = new model.hdsTabModifier
+      })
+    }
   }
 
   @Builder
@@ -369,25 +387,7 @@ struct Index {
       .onTouch(()=>{
         this.isDynamicIslandExpanded = false;
       })
-      .onAppear(()=>{
-        if (deviceInfo.distributionOSApiVersion >= 60100){
-          import('../Modifer/hdsTabModeifier').then((model)=>{
-            this.HdsTabModifier = new model.hdsTabModifier
-          })
-        }else {
 
-          // this.HdsTabModifier = {
-          //   applyNormalAttribute(instance: HdsTabsAttribute){
-          //     instance.barHeight( this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
-          //       this.windowProperties.bottomRect + 48  : '100%')
-          //     instance.barWidth(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%')
-          //     instance.barPosition(this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? BarPosition.End :
-          //       BarPosition.Start)
-          //     instance.vertical(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
-          //
-          //   }}
-        }
-      })
 
       this.buildFloatingDynamicIsland()
     }
