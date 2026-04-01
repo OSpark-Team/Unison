@@ -1,6 +1,5 @@
 import { AbilityConstant, common } from '@kit.AbilityKit';
 import { ContinueData } from '../model/ContinueData';
-import { PreferencesUtil } from './PreferencesUtil';
 
 /**
  * 应用接续开关工具类

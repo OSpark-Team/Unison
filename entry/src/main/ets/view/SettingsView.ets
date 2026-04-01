@@ -55,7 +55,7 @@ export struct SettingsView {
   @Local aboutBundleName: string = '';
   @Local aboutVersionName: string = '';
   @Local aboutVersionCode: number = 0;
-  @Local aboutAppName: string = 'Unison';
+  @Local aboutAppName: string = '';
   @Local feedbackContent: string = '';
   @Local feedbackContact: string = '';
   @Local feedbackSubmitting: boolean = false;
@@ -150,8 +150,12 @@ export struct SettingsView {
       this.aboutBundleName = info.name;
       this.aboutVersionName = info.versionName;
       this.aboutVersionCode = info.versionCode;
-      // 硬编码应用名称为 Unison
-      this.aboutAppName = 'Unison';
+      // 从资源获取应用名称
+      const uiContext = this.getUIContext();
+      const hostContext = uiContext.getHostContext();
+      if (hostContext) {
+        this.aboutAppName = hostContext.resourceManager.getStringByNameSync('app_name');
+      }
     } catch (err) {
       Logger.error(TAG, `Failed to load bundle info: ${JSON.stringify(err)}`);
     }
@@ -590,7 +594,7 @@ export struct SettingsView {
   @Builder
   private buildPersonalSetting(){
     Column(){
-      this.buildSheetHeader('个性化设置')
+      this.buildSheetHeader($r('app.string.sheet_title_personal_setting'))
       Divider()
         .strokeWidth(1)
         .color($r('app.color.divider'));
@@ -938,8 +942,8 @@ export struct SettingsView {
         SettingItem({
           type: 'navigation',
           icon: $r('sys.symbol.paintbrush'),
-          title: '个性化设置',
-          description: '随心所欲',
+          title: $r('app.string.setting_personal_setting'),
+          description: $r('app.string.setting_personal_setting_desc'),
           isLast: false,
           onItemClick: () => {
             this.openSheet('personalSetting');

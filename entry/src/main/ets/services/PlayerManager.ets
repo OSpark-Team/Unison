@@ -62,6 +62,8 @@ export class PlayerManager {
   private completionFired = false;
   /** 播放进度监控定时器 */
   private completionTimer: number = -1;
+  /** 当前是否是刚加载完成、尚未真正启动的新音源 */
+  private sourcePendingStart = false;
 
   /** 序列号，用于在连续调用 load 时通过闭包识别并拦截过时的异步回调 */
   private seq = 0;
@@ -209,7 +211,12 @@ export class PlayerManager {
 
     // 创建解码流
     const dec = this.decoderTool.createStreamDecoder(source, {}, {
-      onError: (e: Error) => this.dispatch(cb => cb.onError?.(e)),
+      onError: (e: Error) => {
+        if (this.seq !== currentSeq) {
+          return;
+        }
+        this.dispatch(cb => cb.onError?.(e));
+      },
     });
     this.decoder = dec;
 
@@ -221,9 +228,11 @@ export class PlayerManager {
       this.streamInfo = info;
       this.prepared = true;
       this.completionFired = false;
+      this.sourcePendingStart = true;
 
       //  通知内部订阅者
       this.dispatch(cb => cb.onDurationChange?.(info.durationMs));
+      this.dispatch(cb => cb.onSeek?.(0));
 
 
       // 监听流结束
@@ -253,18 +262,24 @@ export class PlayerManager {
     }
 
     const state = this.renderer.getState();
+    const shouldStartFresh = this.sourcePendingStart || state === audio.AudioState.STATE_STOPPED;
 
     try {
-      if (state === audio.AudioState.STATE_PAUSED || state === audio.AudioState.STATE_STOPPED) {
+      if (state === audio.AudioState.STATE_PAUSED && !shouldStartFresh) {
         await this.renderer.resume();
       } else {
         await this.renderer.play(this.decoder, this.streamInfo);
       }
 
+      this.sourcePendingStart = false;
+
       this.startCompletionWatchdog();
 
       // 同步系统状态
-      avSessionManager.syncPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY, this.renderer.getCurrentPosition());
+      avSessionManager.syncPlaybackState(
+        avSession.PlaybackState.PLAYBACK_STATE_PLAY,
+        shouldStartFresh ? 0 : this.renderer.getCurrentPosition()
+      );
     } catch (e) {
       this.dispatch(cb => cb.onError?.(e as Error));
     }
@@ -304,6 +319,10 @@ export class PlayerManager {
    */
   public async seek(positionMs: number): Promise<void> {
     if (!this.prepared) return;
+    if (this.sourcePendingStart) {
+      Logger.warn(TAG, 'seek ignored while pending fresh source start');
+      return;
+    }
     try {
       await this.renderer?.seekTo(positionMs);
       this.dispatch(cb => cb.onSeek?.(positionMs));
@@ -405,6 +424,7 @@ export class PlayerManager {
     this.streamInfo = null;
     this.prepared = false;
     this.completionFired = false;
+    this.sourcePendingStart = false;
   }
 
   /**
@@ -421,8 +441,14 @@ export class PlayerManager {
       const dur = this.getDuration();
       const pos = this.getCurrentPosition();
 
+      // 保护性检查：如果 position 超过 duration，说明是旧流的脏数据，跳过本次判断
+      // 这种情况会在切歌时发生：旧流的 position 残留在 renderer 中，新歌 duration 较短
+      if (dur <= 0 || pos > dur) {
+        return;
+      }
+
       // 距离结束小于 50ms 视为完成
-      if (dur > 0 && pos >= dur - 50) {
+      if (pos >= dur - 50) {
         await this.handleCompleted();
       }
     }, 200);

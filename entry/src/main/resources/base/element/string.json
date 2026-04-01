@@ -1227,6 +1227,22 @@
     {
       "name": "sleep_timer_cancel",
       "value": "取消定时"
+    },
+    {
+      "name": "sheet_title_personal_setting",
+      "value": "个性化设置"
+    },
+    {
+      "name": "setting_personal_setting",
+      "value": "个性化设置"
+    },
+    {
+      "name": "setting_personal_setting_desc",
+      "value": "随心所欲"
+    },
+    {
+      "name": "app_name",
+      "value": "Unison"
     }
   ]
 }

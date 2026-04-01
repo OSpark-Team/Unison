@@ -1195,6 +1195,22 @@
     {
       "name": "now_playing_lyrics_empty",
       "value": "No lyrics available"
+    },
+    {
+      "name": "sheet_title_personal_setting",
+      "value": "Personalization"
+    },
+    {
+      "name": "setting_personal_setting",
+      "value": "Personalization"
+    },
+    {
+      "name": "setting_personal_setting_desc",
+      "value": "Customize your experience"
+    },
+    {
+      "name": "app_name",
+      "value": "Unison"
     }
   ]
 }
