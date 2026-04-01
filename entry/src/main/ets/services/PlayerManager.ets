@@ -5,8 +5,9 @@ import { AudioRendererPlayer, PcmDecoderTool, PcmStreamDecoder, PcmStreamInfo } 
 import { avSessionManager } from './AVSessionManager';
 import Logger from '../utils/Logger';
 import { backgroundRunningManager } from '../utils/BackgroundRunningManager';
-import { PersistenceV2 } from '@kit.ArkUI';
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
 import SettingViewModel from '../viewmodel/SettingViewModel';
+import { isPlaying } from '../model/adapter/TabSetting';
 
 const TAG = 'AVPlayerManager';
 
@@ -283,6 +284,12 @@ export class PlayerManager {
     } catch (e) {
       this.dispatch(cb => cb.onError?.(e as Error));
     }
+    let IsPlaying: isPlaying = AppStorageV2.connect(
+      isPlaying,
+      "isPlaying",
+      () => new isPlaying(),
+    )!;
+    IsPlaying.isPlaying =true
   }
 
   /**
@@ -297,6 +304,12 @@ export class PlayerManager {
     } catch (e) {
       this.dispatch(cb => cb.onError?.(e as Error));
     }
+    let IsPlaying: isPlaying = AppStorageV2.connect(
+      isPlaying,
+      "isPlaying",
+      () => new isPlaying(),
+    )!;
+    IsPlaying.isPlaying =false
   }
 
   /**
@@ -311,6 +324,12 @@ export class PlayerManager {
     } catch (e) {
       this.dispatch(cb => cb.onError?.(e as Error));
     }
+    let IsPlaying: isPlaying = AppStorageV2.connect(
+      isPlaying,
+      "isPlaying",
+      () => new isPlaying(),
+    )!;
+    IsPlaying.isPlaying =false
   }
 
   /**
