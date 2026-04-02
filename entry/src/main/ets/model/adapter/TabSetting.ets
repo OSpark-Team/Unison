@@ -17,8 +17,10 @@ export default class TabSettingModel {
   @Trace TabMaterialLevel: number = 10;
 
   // Tab栏背景颜色，支持资源字符串类型（如颜色资源引用或十六进制颜色值）
-  @Trace backgroundColor: ResourceStr = ''
+  @Trace useBackgroundColor: boolean = false
 
+  @Trace backgroundColor: ResourceStr = '#cc123456'
+  // Tab栏背景颜色，支持资源字符串类型（如颜色资源引用或十六进制颜色值）
 }
 
 @ObservedV2

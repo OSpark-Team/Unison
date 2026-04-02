@@ -101,7 +101,7 @@ struct Index {
         .fontWeight(FontWeight.Medium)
         .fontColor(this.currentIndex === targetIndex ? $r('app.color.tab_selected') : $r('app.color.tab_normal'))
     }
-    .borderRadius({ topLeft: this.settingModel.radiusTabTop, topRight: this.settingModel.radiusTabTop })
+    .borderRadius(this.TabSettingModel.barFloatingStyle?'50%': { topLeft: this.settingModel.radiusTabTop, topRight: this.settingModel.radiusTabTop,bottomLeft:this.settingModel.radiusTabTop,bottomRight:this.settingModel.radiusTabTop })
     .onClick(() => {
       this.getUIContext()?.animateTo({
         duration: 150,
@@ -115,7 +115,11 @@ struct Index {
       bottom: this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ?
         this.windowProperties.bottomRect / 2 : 0
     })
+    .backgroundColor(this.currentIndex === targetIndex ?(this.TabSettingModel.useBackgroundColor? this.TabSettingModel.backgroundColor:'#0000000'):'#0000000')
     .width('100%')
+    .padding(4)
+    .border({color:$r('sys.color.font_on_secondary'),width:this.currentIndex === targetIndex&&this.TabSettingModel.useBackgroundColor? 2:0})
+
     .justifyContent(FlexAlign.Center)
   }
 
