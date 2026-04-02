@@ -418,7 +418,7 @@ export struct HomeView {
       })
     }
     .edgeEffect(EdgeEffect.Spring)
-    .contentEndOffset(this.TabSettingModel.barFloatingStyle?72:0)
+    .contentEndOffset(this.TabSettingModel.barFloatingStyle?72+48+10:0)
     .scrollBar(BarState.Off)
     .height("100%")
     .width("100%")

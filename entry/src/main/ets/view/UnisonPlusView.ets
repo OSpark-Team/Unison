@@ -1200,7 +1200,7 @@ export struct UnisonPlusView {
       .backgroundColor($r('app.color.background_primary'))
     }
     .margin({
-      bottom: this.windowProperties.bottomRect +(this.TabSettingModel.barFloatingStyle?72:0),
+      bottom: this.windowProperties.bottomRect +(this.TabSettingModel.barFloatingStyle?72+48+10:0),
       top: this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? this.windowProperties.topRect + 64 : 100,
       left: 24,
       right: 24,

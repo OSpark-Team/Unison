@@ -20,7 +20,7 @@ export  struct  miniPlayingCtrl{
     "isPlaying",
     () => new isPlaying(),
   )!;
-
+  @Consumer() pageInfos: NavPathStack = new NavPathStack();
   private playNext(): void {
     const next = this.playlistViewModel.nextSong(true);
     if (next) this.playlistViewModel.playSong(next, true);
@@ -53,18 +53,33 @@ export  struct  miniPlayingCtrl{
         .layoutWeight(1)
         .maxLines(1)
         .textOverflow({overflow:TextOverflow.MARQUEE})
-      SymbolGlyph(this.IsPlaying.isPlaying ? $r("sys.symbol.pause_fill") : $r("sys.symbol.play_fill")).fontColor([$r('sys.color.font')])
-        .width(32)
-        .onClick(()=>{
-          this.togglePlayPause()
+      Button({ type: ButtonType.Circle }){
+        SymbolGlyph(this.IsPlaying.isPlaying ? $r("sys.symbol.pause_fill") : $r("sys.symbol.play_fill")).fontColor([$r('sys.color.font')])
+          .fontSize(16)
+      }        .onClick(()=>{
+        this.togglePlayPause()
+      }).align(Alignment.Center)
+      .backgroundColor("#00000000")
+      .width(32).height(32)
+
+      Blank().width(4)
+
+      Button({ type: ButtonType.Circle }){
+        SymbolGlyph($r('sys.symbol.forward_end_fill')).fontColor([$r('sys.color.font')])
+          .fontSize(16)
+      }
+      .width(32).height(32)
+      .onClick(()=>{
+        this.playNext()
       })
-      SymbolGlyph($r('sys.symbol.forward_end_fill')).fontColor([$r('sys.color.font')])
-        .width(32)
-        .onClick(()=>{
-          this.playNext()
-        })
+      .backgroundColor("#00000000")
+
+
 
     }.width('100%')
+    // .onClick(()=>{
+    //   this.pageInfos.pushPathByName('NowPlaying',true,null)
+    // })
   }
   build() {
     HdsTabs(){
