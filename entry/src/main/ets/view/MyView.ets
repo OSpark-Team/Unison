@@ -46,7 +46,7 @@ export struct MyView {
         right: 24,
       })
     }
-    .contentEndOffset(this.TabSettingModel.barFloatingStyle?72:0)
+    .contentEndOffset(this.TabSettingModel.barFloatingStyle?72+48+10:0)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
     .align(Alignment.Top)
