@@ -215,7 +215,7 @@ export struct LibraryView {
       Scroll(this.scroller) {
         this.PlaylistGrid()
 
-      }.contentEndOffset(this.TabSettingModel.barFloatingStyle?72:0)
+      }.contentEndOffset(this.TabSettingModel.barFloatingStyle?72+48+10:0)
       .align(Alignment.Top)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
