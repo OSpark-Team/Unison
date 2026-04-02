@@ -217,10 +217,6 @@ export default struct TabSettingCom {
 
         // 当启用悬浮状态栏时，显示材质相关设置
         if (this.TabSettingModel.barFloatingStyle) {
-          this.TypeSelectRow() // 材质类型选择
-          Divider().strokeWidth(0.5).color($r('app.color.divider')).margin({ left: 16, right: 16 })
-          this.LevelSelectRow() // 材质等级选择
-          Divider().strokeWidth(0.5).color($r('app.color.divider')).margin({ left: 16, right: 16 })
           SettingItem({
             type: 'switch',
             icon: undefined,
@@ -242,8 +238,13 @@ export default struct TabSettingCom {
 
               })
             },
-            isLast:true,
+            isLast:false,
           })
+          Divider().strokeWidth(0.5).color($r('app.color.divider')).margin({ left: 16, right: 16 })
+          this.TypeSelectRow() // 材质类型选择
+          Divider().strokeWidth(0.5).color($r('app.color.divider')).margin({ left: 16, right: 16 })
+          this.LevelSelectRow() // 材质等级选择
+
         }
       }
       .width('100%')
