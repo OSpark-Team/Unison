@@ -212,14 +212,39 @@ export default struct TabSettingCom {
               this.TabSettingModel.barFloatingStyle = value;
             })
           },
-          isLast: true,
+          isLast:!this.TabSettingModel.barFloatingStyle,
         })
 
         // 当启用悬浮状态栏时，显示材质相关设置
         if (this.TabSettingModel.barFloatingStyle) {
+          SettingItem({
+            type: 'switch',
+            icon: undefined,
+            title: '选中背景色',
+            description: undefined,
+            value: this.TabSettingModel.useBackgroundColor,
+            onChange: (value: boolean) => {
+              // 使用动画过渡效果更新状态
+              this.getUIContext().animateTo({
+                duration: 200,
+                curve: Curve.Linear
+              }, () => {
+                this.TabSettingModel.useBackgroundColor = value;
+                if (value) {
+                  if (this.TabSettingModel.backgroundColor ==''||this.TabSettingModel.backgroundColor == undefined||this.TabSettingModel.backgroundColor == null) {
+                    this.TabSettingModel.backgroundColor ='#cc123456'
+                  }
+                }
+
+              })
+            },
+            isLast:false,
+          })
+          Divider().strokeWidth(0.5).color($r('app.color.divider')).margin({ left: 16, right: 16 })
           this.TypeSelectRow() // 材质类型选择
           Divider().strokeWidth(0.5).color($r('app.color.divider')).margin({ left: 16, right: 16 })
           this.LevelSelectRow() // 材质等级选择
+
         }
       }
       .width('100%')

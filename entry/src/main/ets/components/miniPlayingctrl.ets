@@ -6,6 +6,8 @@ import PlaylistViewModel from "../viewmodel/PlaylistViewModel";
 import { cover } from "../utils/Tools";
 import { PlayerCallbacks, playerManager } from "../services/PlayerManager";
 import { songPlayerManager } from "../services/SongPlayerManager";
+import { WindowProperties } from "../model/WindowProperties";
+import { BreakpointConstants } from "../common/BreakpointConstants";
 
 @ComponentV2
 export  struct  miniPlayingCtrl{
@@ -20,6 +22,12 @@ export  struct  miniPlayingCtrl{
     "isPlaying",
     () => new isPlaying(),
   )!;
+  @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
+  /**
+   * 窗口属性
+   */
+  @Local windowProperties: WindowProperties =
+    AppStorageV2.connect(WindowProperties, "WindowProperties", () => new WindowProperties())!;
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   private playNext(): void {
     const next = this.playlistViewModel.nextSong(true);
@@ -105,6 +113,8 @@ export  struct  miniPlayingCtrl{
         //   miniBarBuilder: () => this.miniBarBuilder()
         // }
       })
+    .barWidth(this.TabSettingModel.barFloatingStyle?(this.windowProperties.currentBreakpoint == BreakpointConstants.BREAKPOINT_MD ? 400 :this.windowProperties.currentBreakpoint == BreakpointConstants.BREAKPOINT_LG? 500: 300):(this.windowProperties.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? 100 : '100%'))
+
 
   }
 }
