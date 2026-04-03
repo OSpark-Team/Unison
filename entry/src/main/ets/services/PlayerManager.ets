@@ -259,6 +259,8 @@ export class PlayerManager {
   public async play(): Promise<void> {
     if (!this.prepared || !this.decoder || !this.streamInfo) {
       Logger.warn(TAG, 'play called before prepared');
+      // 即使提前返回，也要确保 sourcePendingStart 被清零，避免残留导致后续 watchdog 被跳过
+      this.sourcePendingStart = false;
       return;
     }
 
@@ -338,9 +340,9 @@ export class PlayerManager {
    */
   public async seek(positionMs: number): Promise<void> {
     if (!this.prepared) return;
+    // 如果用户已经可以 seek，说明音源已经可以被操作，清除 pending 状态
     if (this.sourcePendingStart) {
-      Logger.warn(TAG, 'seek ignored while pending fresh source start');
-      return;
+      this.sourcePendingStart = false;
     }
     try {
       await this.renderer?.seekTo(positionMs);
@@ -454,19 +456,25 @@ export class PlayerManager {
   private startCompletionWatchdog(): void {
     if (this.completionTimer !== -1) return;
 
-    this.completionTimer = setInterval(async () => {
-      if (this.completionFired || !this.renderer || !this.isPlaying()) return;
+this.completionTimer = setInterval(async () => {
+      if (this.completionFired || !this.renderer || this.sourcePendingStart) return;
 
       const dur = this.getDuration();
       const pos = this.getCurrentPosition();
 
-      // 保护性检查：如果 position 超过 duration，说明是旧流的脏数据，跳过本次判断
-      // 这种情况会在切歌时发生：旧流的 position 残留在 renderer 中，新歌 duration 较短
-      if (dur <= 0 || pos > dur) {
+      // 无效时长，跳过检查
+      if (dur <= 0) {
         return;
       }
 
-      // 距离结束小于 50ms 视为完成
+      // 保护性检查：如果 position 远超过 duration（>500ms），说明是旧流的脏数据，跳过本次判断
+      // 这种情况会在切歌时发生：旧流的 position 残留在 renderer 中，新歌 duration 较短
+      // 但允许轻微超出（PCM流末尾可能有微小偏差）
+      if (pos > dur + 500) {
+        return;
+      }
+
+      // 距离结束小于 50ms 视为完成（包括 position 轻微超过 duration 的情况）
       if (pos >= dur - 50) {
         await this.handleCompleted();
       }
