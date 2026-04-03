@@ -46,10 +46,7 @@ struct Index {
     AppStorageV2.connect(SourceListViewModel, 'SourceListViewModel', () => new SourceListViewModel())!;
   @Local HdsTabModifier: AttributeModifier<HdsTabsAttribute> | undefined = undefined
   @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
-  @Monitor('TabSettingModel.barFloatingStyle')
-  HdsTabModifierChange(){
 
-  }
   /**
    * 是否显示灵动岛
    */
