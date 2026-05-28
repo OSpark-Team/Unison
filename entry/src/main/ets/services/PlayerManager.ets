@@ -40,12 +40,33 @@ export interface PlayerCallbacks {
 }
 
 /**
+ * 内部逻辑状态枚举。
+ * 与底层 renderer 的物理状态分离：renderer 状态是异步反映，逻辑状态由 PlayerManager 显式控制。
+ */
+enum LogicState {
+  IDLE = 0,       // 空闲/无音源
+  LOADING = 1,    // 正在加载新音源（解码器创建到 ready 完成之间）
+  READY = 2,      // 加载完成、未启动播放
+  PLAYING = 3,    // 播放中
+  PAUSED = 4,     // 暂停
+  STOPPED = 5,    // 停止
+  COMPLETED = 6,  // 播放完成（自然结束）
+}
+
+/**
  * PlayerManager - 音频播放核心管理类
- * * @description 职责范围：
+ *
+ * @description 职责范围：
  * 1. 管理 Free-PCM 播放管线的完整生命周期（加载、渲染、销毁）。
  * 2. 自动与 AVSessionManager 联动，确保系统媒体中心状态同步。
  * 3. 支持多订阅者模式，允许多个页面或模块独立监听播放状态。
- * 4. 内置异步竞态保护机制（Sequence ID）。
+ * 4. 内置异步竞态保护（sequence + load mutex）。
+ *
+ * @remarks
+ * 重要状态约定：
+ * - `logicState` 与 `renderer.getState()` 双轨：逻辑状态用于决策，物理状态用于驱动；
+ * - `loadSeq` 在每次 load 时自增，所有异步回调必须校验自己的 seq 与当前 seq 一致；
+ * - `completionWatchdog` 只在 LogicState === PLAYING 时检测完成，防止暂停误判。
  */
 export class PlayerManager {
   /** 内部音频渲染器 */
@@ -57,17 +78,19 @@ export class PlayerManager {
   /** 解码工具实例 */
   private decoderTool = new PcmDecoderTool();
 
-  /** 播放器是否已准备就绪 */
-  private prepared = false;
+  /** 逻辑状态机 */
+  private logicState: LogicState = LogicState.IDLE;
   /** 是否已触发过当前音源的完成回调 */
   private completionFired = false;
   /** 播放进度监控定时器 */
   private completionTimer: number = -1;
-  /** 当前是否是刚加载完成、尚未真正启动的新音源 */
-  private sourcePendingStart = false;
 
-  /** 序列号，用于在连续调用 load 时通过闭包识别并拦截过时的异步回调 */
-  private seq = 0;
+  /** load 序列号，每次 load 自增，用于拦截过时异步回调 */
+  private loadSeq = 0;
+  /** 当前活跃的 load seq（用于 watchdog 与脏数据判定） */
+  private activeLoadSeq = 0;
+  /** load 互斥锁：串行化 load 调用，避免 cleanup 之间的竞态 */
+  private loadGuard: Promise<void> = Promise.resolve();
 
   /** 订阅者映射表 [订阅者ID, 回调实现] */
   private subscribers: Map<string, PlayerCallbacks> = new Map();
@@ -200,20 +223,55 @@ export class PlayerManager {
 
   /**
    * 加载音源并准备播放。
-   * 会自动清理上一个音源并同步元数据到系统媒体中心。
+   *
+   * @description 通过 loadGuard 串行化所有 load 调用，避免并发 cleanup/decoder 创建造成的状态错乱。
+   * 旧的 in-flight load 通过 loadSeq 比对自动失效（不会写入 streamInfo / prepared 等）。
+   *
    * @param string source - 音频资源的 URI 或本地路径
    * @returns Promise<void>
    */
   public async load(source: string): Promise<void> {
-    await this.cleanup();
+    // 抢占式取消：先递增 seq，让任何在途的旧回调立即作废
+    this.loadSeq++;
+    const currentSeq = this.loadSeq;
 
-    this.seq++;
-    const currentSeq = this.seq;
+    // 排队等待上一个 load 完成（cleanup → 解码器准备）
+    const prevGuard = this.loadGuard;
+    let releaseGuard: () => void = () => {};
+    this.loadGuard = new Promise<void>((resolve) => {
+      releaseGuard = resolve;
+    });
+    try {
+      await prevGuard;
+    } catch (_e) {
+      // prevGuard 不会 reject，保护性处理
+    }
+
+    // 等待解锁后再次确认：若期间又来新 load，本次直接放弃
+    if (this.loadSeq !== currentSeq) {
+      releaseGuard();
+      return;
+    }
+
+    try {
+      await this._loadInternal(source, currentSeq);
+    } finally {
+      releaseGuard();
+    }
+  }
+
+  private async _loadInternal(source: string, currentSeq: number): Promise<void> {
+    await this.cleanup();
+    if (this.loadSeq !== currentSeq) {
+      return;
+    }
+
+    this.logicState = LogicState.LOADING;
 
     // 创建解码流
     const dec = this.decoderTool.createStreamDecoder(source, {}, {
       onError: (e: Error) => {
-        if (this.seq !== currentSeq) {
+        if (this.loadSeq !== currentSeq) {
           return;
         }
         this.dispatch(cb => cb.onError?.(e));
@@ -224,29 +282,29 @@ export class PlayerManager {
     try {
       const info = await dec.ready;
       // 竞态检查：如果序列号已更新，说明 load 被重新调用，丢弃当前陈旧请求
-      if (this.seq !== currentSeq) return;
+      if (this.loadSeq !== currentSeq) {
+        try { dec.close(); } catch (_e) {}
+        return;
+      }
 
       this.streamInfo = info;
-      this.prepared = true;
       this.completionFired = false;
-      this.sourcePendingStart = true;
+      this.activeLoadSeq = currentSeq;
+      this.logicState = LogicState.READY;
 
       //  通知内部订阅者
       this.dispatch(cb => cb.onDurationChange?.(info.durationMs));
       this.dispatch(cb => cb.onSeek?.(0));
 
-
-      // 监听流结束
-      dec.done.then(() => {
-        if (this.seq !== currentSeq) return;
-        this.startCompletionWatchdog();
-      }).catch((e: Error) => {
-        if (this.seq !== currentSeq) return;
+      // 监听流结束（仅记录，watchdog 真正启动延后到 play 成功后）
+      dec.done.catch((e: Error) => {
+        if (this.loadSeq !== currentSeq) return;
         this.dispatch(cb => cb.onError?.(e));
       });
 
     } catch (e) {
-      if (this.seq === currentSeq) {
+      if (this.loadSeq === currentSeq) {
+        this.logicState = LogicState.IDLE;
         this.dispatch(cb => cb.onError?.(e as Error));
       }
     }
@@ -255,43 +313,64 @@ export class PlayerManager {
   /**
    * 开始或恢复播放。
    * 同时更新系统 AVSession 状态为 PLAY。
+   *
+   * @remarks
+   * 状态转换：
+   * - READY → renderer.play(decoder, info) → PLAYING
+   * - PAUSED → renderer.resume() → PLAYING
+   * - STOPPED / COMPLETED → renderer.play(decoder, info) → PLAYING（视为重启）
+   * - PLAYING → 直接返回（已在播放）
+   * - LOADING / IDLE → 告警后返回
    */
   public async play(): Promise<void> {
-    if (!this.prepared || !this.decoder || !this.streamInfo) {
+    if (this.logicState === LogicState.LOADING || this.logicState === LogicState.IDLE) {
       Logger.warn(TAG, 'play called before prepared');
-      // 即使提前返回，也要确保 sourcePendingStart 被清零，避免残留导致后续 watchdog 被跳过
-      this.sourcePendingStart = false;
+      return;
+    }
+    if (!this.decoder || !this.streamInfo) {
+      Logger.warn(TAG, 'play called without decoder/streamInfo');
+      return;
+    }
+    if (this.logicState === LogicState.PLAYING) {
+      // 已经在播放，幂等返回，防止重启 renderer 导致音频中断
       return;
     }
 
-    const state = this.renderer.getState();
-    const shouldStartFresh = this.sourcePendingStart || state === audio.AudioState.STATE_STOPPED;
+    const prevLogicState = this.logicState;
+    // 仅 PAUSED 可走 resume；READY/STOPPED/COMPLETED 都需要 fresh start
+    const canResume = prevLogicState === LogicState.PAUSED;
+    const playedSeq = this.activeLoadSeq;
+
+    // 乐观切换：先进入 PLAYING，watchdog 才会工作；失败时回滚
+    this.logicState = LogicState.PLAYING;
 
     try {
-      if (state === audio.AudioState.STATE_PAUSED && !shouldStartFresh) {
+      if (canResume) {
         await this.renderer.resume();
       } else {
         await this.renderer.play(this.decoder, this.streamInfo);
       }
 
-      this.sourcePendingStart = false;
-
+      // 启动完成监控（只此一处启动入口）
       this.startCompletionWatchdog();
 
       // 同步系统状态
       avSessionManager.syncPlaybackState(
         avSession.PlaybackState.PLAYBACK_STATE_PLAY,
-        shouldStartFresh ? 0 : this.renderer.getCurrentPosition()
+        canResume ? this.renderer.getCurrentPosition() : 0
       );
+
+      // 与 UI 同步播放状态（仅在确认成功后写入）
+      this.writeExternalPlayingState(true);
     } catch (e) {
+      // 失败时回滚逻辑状态，避免 watchdog 在不正确状态下运行
+      // 若期间已被新 load 取代（activeLoadSeq 变化），不回滚以免覆盖新状态
+      if (this.activeLoadSeq === playedSeq) {
+        this.logicState = prevLogicState;
+      }
+      this.writeExternalPlayingState(false);
       this.dispatch(cb => cb.onError?.(e as Error));
     }
-    let IsPlaying: isPlaying = AppStorageV2.connect(
-      isPlaying,
-      "isPlaying",
-      () => new isPlaying(),
-    )!;
-    IsPlaying.isPlaying =true
   }
 
   /**
@@ -301,17 +380,14 @@ export class PlayerManager {
   public async pause(): Promise<void> {
     try {
       await this.renderer?.pause();
-
+      this.logicState = LogicState.PAUSED;
       avSessionManager.syncPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE, this.renderer.getCurrentPosition());
     } catch (e) {
       this.dispatch(cb => cb.onError?.(e as Error));
+    } finally {
+      // 暂停后状态确定为非播放（无论 renderer 调用是否成功，UI 应反映用户意图）
+      this.writeExternalPlayingState(false);
     }
-    let IsPlaying: isPlaying = AppStorageV2.connect(
-      isPlaying,
-      "isPlaying",
-      () => new isPlaying(),
-    )!;
-    IsPlaying.isPlaying =false
   }
 
   /**
@@ -321,17 +397,13 @@ export class PlayerManager {
     try {
       await this.renderer?.stop();
       this.stopCompletionWatchdog();
-
+      this.logicState = LogicState.STOPPED;
       avSessionManager.syncPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_STOP);
     } catch (e) {
       this.dispatch(cb => cb.onError?.(e as Error));
+    } finally {
+      this.writeExternalPlayingState(false);
     }
-    let IsPlaying: isPlaying = AppStorageV2.connect(
-      isPlaying,
-      "isPlaying",
-      () => new isPlaying(),
-    )!;
-    IsPlaying.isPlaying =false
   }
 
   /**
@@ -339,10 +411,8 @@ export class PlayerManager {
    * @param number positionMs - 目标位置（毫秒）
    */
   public async seek(positionMs: number): Promise<void> {
-    if (!this.prepared) return;
-    // 如果用户已经可以 seek，说明音源已经可以被操作，清除 pending 状态
-    if (this.sourcePendingStart) {
-      this.sourcePendingStart = false;
+    if (this.logicState === LogicState.IDLE || this.logicState === LogicState.LOADING) {
+      return;
     }
     try {
       await this.renderer?.seekTo(positionMs);
@@ -385,9 +455,17 @@ export class PlayerManager {
     return this.renderer?.getState() === audio.AudioState.STATE_RUNNING;
   }
 
-  /** @returns boolean 当前音频资源是否已准备完成 */
+  /**
+   * @returns boolean 当前音频资源是否已准备完成
+   * @remarks 与旧版 `prepared` 字段语义一致：只要 decoder/streamInfo 仍可用且不在加载中即返回 true。
+   * 这样 SongPlayerManager.playCurrentSongOrResume 在 STOPPED/COMPLETED 状态下也能复用既有解码器，
+   * 避免不必要的重新加载与网络请求。
+   */
   public isPrepared(): boolean {
-    return this.prepared;
+    return this.decoder !== null
+      && this.streamInfo !== null
+      && this.logicState !== LogicState.IDLE
+      && this.logicState !== LogicState.LOADING;
   }
 
   // ── 内部私有方法 ──────────────────────────────────────────────────────────
@@ -443,38 +521,45 @@ export class PlayerManager {
     try { this.decoder?.close(); } catch (_e) {}
     this.decoder = null;
     this.streamInfo = null;
-    this.prepared = false;
     this.completionFired = false;
-    this.sourcePendingStart = false;
+    this.activeLoadSeq = 0;
+    this.logicState = LogicState.IDLE;
   }
 
   /**
    * 启动播放完成监控。
-   * 由于部分 PCM 流结尾可能存在微小偏差，采用轮询方式确保完成回调触发。
+   *
+   * @remarks
+   * 严格触发条件（任一不满足都跳过）：
+   * 1. 逻辑状态必须是 PLAYING（修复关键 bug：暂停时不再误触发 completion）；
+   * 2. 物理 renderer 状态必须是 STATE_RUNNING；
+   * 3. activeLoadSeq 必须有效（=0 视为无活跃音源）；
+   * 4. duration > 0；
+   * 5. position 必须在 [0, dur + 200] 范围内（200ms 是 PCM 末尾微小偏差容差）；
+   * 6. 接近结尾（>= dur - 50）。
    * @private
    */
   private startCompletionWatchdog(): void {
     if (this.completionTimer !== -1) return;
 
-this.completionTimer = setInterval(async () => {
-      if (this.completionFired || !this.renderer || this.sourcePendingStart) return;
+    this.completionTimer = setInterval(async () => {
+      if (this.completionFired || !this.renderer) return;
+      // 必须处于逻辑播放状态
+      if (this.logicState !== LogicState.PLAYING) return;
+      // 必须有活跃音源
+      if (this.activeLoadSeq === 0) return;
+      // 物理状态必须为 RUNNING
+      if (this.renderer.getState() !== audio.AudioState.STATE_RUNNING) return;
 
       const dur = this.getDuration();
       const pos = this.getCurrentPosition();
 
       // 无效时长，跳过检查
-      if (dur <= 0) {
-        return;
-      }
+      if (dur <= 0) return;
+      // 异常 position（旧流脏数据或解码器尚未对齐）
+      if (pos < 0 || pos > dur + 200) return;
 
-      // 保护性检查：如果 position 远超过 duration（>500ms），说明是旧流的脏数据，跳过本次判断
-      // 这种情况会在切歌时发生：旧流的 position 残留在 renderer 中，新歌 duration 较短
-      // 但允许轻微超出（PCM流末尾可能有微小偏差）
-      if (pos > dur + 500) {
-        return;
-      }
-
-      // 距离结束小于 50ms 视为完成（包括 position 轻微超过 duration 的情况）
+      // 距离结束小于 50ms 视为完成
       if (pos >= dur - 50) {
         await this.handleCompleted();
       }
@@ -497,10 +582,30 @@ this.completionTimer = setInterval(async () => {
     if (this.completionFired) return;
     this.completionFired = true;
     this.stopCompletionWatchdog();
+    this.logicState = LogicState.COMPLETED;
 
     this.dispatch(cb => cb.onCompleted?.());
     // 通知系统媒体中心状态变更为暂停/结束
     avSessionManager.syncPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE);
+  }
+
+  /**
+   * 将播放/暂停状态同步到全局 AppStorageV2（供悬浮 UI 使用）。
+   * 集中写入，避免在多个分支重复书写且容易遗漏。
+   * @private
+   */
+  private writeExternalPlayingState(playing: boolean): void {
+    try {
+      const flag = AppStorageV2.connect(
+        isPlaying,
+        'isPlaying',
+        () => new isPlaying(),
+      )!;
+      flag.isPlaying = playing;
+    } catch (e) {
+      // 写状态失败不应影响主流程
+      Logger.warn(TAG, `Failed to sync external isPlaying flag: ${JSON.stringify(e)}`);
+    }
   }
 
   /**

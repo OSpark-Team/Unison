@@ -255,6 +255,11 @@ export default class PlaylistViewModel {
 
   /**
    * 抽取 emit 逻辑 (已加入防抖)
+   *
+   * @remarks 防抖窗口 80ms：
+   * - 用户极快连点（一指两触 50ms 内）会被合并；
+   * - 但不会让单次切歌付出 350ms 的可感知延迟。
+   * - 真正的并发竞态保护由下游 SongPlayerManager.songChangeSeq 与 PlayerManager.loadSeq 兜底。
    */
   private emitCurrentSongUpdated(song: Song): void {
     // 如果之前有定时器，清除它
@@ -262,7 +267,6 @@ export default class PlaylistViewModel {
       clearTimeout(this.emitTimerId);
     }
 
-    // 设置新的防抖定时器，延迟 350 毫秒执行 (可根据需要调整时间)
     this.emitTimerId = setTimeout(() => {
       Logger.info(PlaylistViewModel.TAG, 'Current song actually changed (Debounced): ' + (song.name ?? ''));
       emitter.emit(
@@ -275,7 +279,7 @@ export default class PlaylistViewModel {
         }
       );
       this.emitTimerId = -1; // 执行完毕后重置 ID
-    }, 350);
+    }, 80);
   }
 
   /**

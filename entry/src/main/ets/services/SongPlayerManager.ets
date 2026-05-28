@@ -424,16 +424,58 @@ export class SongPlayerManager {
     });
   }
 
+  /**
+   * 当前正在处理的歌曲切换任务的版本号。
+   * 每次有新切歌请求时自增；任何处于异步 await 的旧任务发现自身版本过期就立即终止。
+   */
+  private songChangeSeq: number = 0;
+
+  /**
+   * 检查当前正在处理的请求是否仍是最新版本。
+   * 用于在 await 之后判断是否需要继续推进。
+   */
+  private isLatestSongChange(seq: number): boolean {
+    return seq === this.songChangeSeq;
+  }
+
   private async handleSongChanged(song: Song): Promise<void> {
-    Logger.info(TAG, `Handling song changed: ${song.name} By ${song.sourceId}`);
+    // 每次新切歌请求都让旧任务作废，避免网络慢导致的元数据/音频错位
+    this.songChangeSeq++;
+    const currentSeq = this.songChangeSeq;
+
+    Logger.info(TAG, `Handling song changed: ${song.name} By ${song.sourceId} (seq=${currentSeq})`);
     const settingViewModel = this.getSettingViewModel();
     const sourceListViewModel = this.getSourceListViewModel();
 
-    const networkType = await this.checkNetworkAndDataSaver(settingViewModel);
-    await this.fetchSongDetail(song, networkType, settingViewModel, sourceListViewModel);
-    this.syncAvSession(song);
-    await playerManager.load(song.meta!.url!);
-    await playerManager.play();
+    try {
+      const networkType = await this.checkNetworkAndDataSaver(settingViewModel);
+      if (!this.isLatestSongChange(currentSeq)) {
+        Logger.info(TAG, `Stale song change dropped after network check: seq=${currentSeq}`);
+        return;
+      }
+
+      await this.fetchSongDetail(song, networkType, settingViewModel, sourceListViewModel);
+      if (!this.isLatestSongChange(currentSeq)) {
+        Logger.info(TAG, `Stale song change dropped after fetchSongDetail: seq=${currentSeq}`);
+        return;
+      }
+
+      this.syncAvSession(song);
+
+      await playerManager.load(song.meta!.url!);
+      if (!this.isLatestSongChange(currentSeq)) {
+        Logger.info(TAG, `Stale song change dropped after load: seq=${currentSeq}`);
+        return;
+      }
+
+      await playerManager.play();
+    } catch (err) {
+      // 若当前任务已被替代，旧错误不再向上抛
+      if (this.isLatestSongChange(currentSeq)) {
+        throw err as Error;
+      }
+      Logger.warn(TAG, `Stale song change error suppressed: ${(err as Error).message}`);
+    }
   }
 
   public async playCurrentSongOrResume(): Promise<void> {
