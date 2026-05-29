@@ -96,22 +96,12 @@ export default class PlaylistViewModel {
     this.restorePlaybackCacheIfReady();
 
     if (mode !== undefined) {
-      switch (mode) {
-        case avSession.LoopMode.LOOP_MODE_LIST:
-          this.mode = avSession.LoopMode.LOOP_MODE_SINGLE;
-          break;
-        case avSession.LoopMode.LOOP_MODE_SINGLE:
-          this.mode = avSession.LoopMode.LOOP_MODE_SHUFFLE;
-          break;
-        case avSession.LoopMode.LOOP_MODE_SHUFFLE:
-          this.mode = avSession.LoopMode.LOOP_MODE_LIST;
-          break;
-        default:
-          this.mode = avSession.LoopMode.LOOP_MODE_LIST;
-          break;
-      }
+      // 带参：直接设为传入值（用于 avSession setLoopMode 回调同步 / UI 直接指定模式，如 toggleShuffle）。
+      // 旧实现这里设成「传入值的下一个」，导致 NowPlayingLandscape.toggleShuffle 设错模式，
+      // 也会与 avSession 回调形成 mode 反复跳变。
+      this.mode = mode;
     } else {
-      // 循环切换逻辑
+      // 无参：循环切换 LIST → SINGLE → SHUFFLE → LIST（用户点击模式按钮）
       const modes = [
         avSession.LoopMode.LOOP_MODE_LIST,
         avSession.LoopMode.LOOP_MODE_SINGLE,
@@ -470,7 +460,13 @@ export default class PlaylistViewModel {
   private syncCurrentSongWithIndex(): void {
     const targetSong = this.resolveSongByIndex(this.currentIndex);
     if (targetSong) {
-      if (this.currentSong !== targetSong) {
+      // 用 id+sourceId 判定是否同一首歌，而非引用比较：
+      // 切换播放模式时 playlist 会 shuffle/restore（数组重建），同一首歌的对象引用可能改变；
+      // 若按引用比较会重新赋值 currentSong → 触发 @Monitor("currentSong") → emit CURRENT_SONG_UPDATED
+      // → handleSongChanged 从头重载播放（表现为「切换播放模式导致重新播放」）。
+      const isSameSong =
+        this.currentSong?.id === targetSong.id && this.currentSong?.sourceId === targetSong.sourceId;
+      if (!isSameSong) {
         this.currentSong = targetSong;
       }
       return;

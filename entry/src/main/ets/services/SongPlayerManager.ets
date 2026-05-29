@@ -578,7 +578,9 @@ export class SongPlayerManager {
 
       onSetLoopMode: (mode) => {
         Logger.info(TAG, `Set loop mode: ${mode}`);
-        avSessionManager.syncLoopMode(playlistViewModel.setMode(mode));
+        // 仅同步本地播放模式；不再回写 syncLoopMode（avSession 已是该 mode），避免
+        // setAVPlaybackState → setLoopMode 回调 → 再 syncLoopMode 的潜在回环。
+        playlistViewModel.setMode(mode);
       },
 
       onToggleFavorite: async (assetId) => {
