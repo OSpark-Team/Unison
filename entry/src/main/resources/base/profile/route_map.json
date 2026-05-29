@@ -11,11 +11,6 @@
       "buildFunction": "PlaylistDetailBuilder"
     },
     {
-      "name": "NowPlaying",
-      "pageSourceFile": "src/main/ets/pages/NowPlaying.ets",
-      "buildFunction": "NowPlayingBuilder"
-    },
-    {
       "name": "NowPlayingLandscape",
       "pageSourceFile": "src/main/ets/pages/NowPlayingLandscape.ets",
       "buildFunction": "NowPlayingLandscapeBuilder"

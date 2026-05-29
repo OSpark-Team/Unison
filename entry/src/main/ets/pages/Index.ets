@@ -1,4 +1,4 @@
-import { AppStorageV2, CommonModifier, LengthMetrics, PersistenceV2, curves } from '@kit.ArkUI';
+import { AppStorageV2, CommonModifier, LengthMetrics, PersistenceV2 } from '@kit.ArkUI';
 import { BreakpointConstants } from '../common/BreakpointConstants';
 import { WindowProperties } from '../model/WindowProperties';
 import { HomeView } from '../view/HomeView';
@@ -11,11 +11,10 @@ import CurrentSourceViewModel from '../viewmodel/CurrentSourceViewModel';
 import { ContinueSwitch } from '../utils/Continue';
 import { PlaylistDetailParam } from './PlaylistDetail';
 import SettingViewModel from '../viewmodel/SettingViewModel';
-import { DynamicIsland } from '../components/DynamicIsland';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { HdsTabs, HdsTabsAttribute, HdsTabsController } from '@kit.UIDesignKit';
 import TabSettingModel from '../model/adapter/TabSetting';
-import { miniPlayingCtrl } from '../components/miniPlayingctrl';
+import { UnifiedPlayer, UnifiedPlayerController } from '../components/UnifiedPlayer';
 
 @Entry
 @ComponentV2
@@ -48,14 +47,15 @@ struct Index {
   @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
 
   /**
-   * 是否显示灵动岛
+   * 是否隐藏底部播放条（仅横屏播放页 active 时隐藏）
    */
-  @Local showDynamicIsland: boolean = true;
+  @Local hidePlayerBar: boolean = false;
 
   /**
-   * 是否展开灵动岛
+   * 统一播放器跨组件信号（用于返回键兜底收起）
    */
-  @Local isDynamicIslandExpanded: boolean = false;
+  @Local playerController: UnifiedPlayerController =
+    AppStorageV2.connect(UnifiedPlayerController, "UnifiedPlayerController", () => new UnifiedPlayerController())!;
 
 
   private  HomeViewScroller: Scroller = new Scroller(); //HomeView 滚动容器控制器
@@ -268,12 +268,6 @@ struct Index {
         .animationDuration(0)
         .width('100%')
         .height('100%')
-        if (this.TabSettingModel.barFloatingStyle){
-        Column(){
-          miniPlayingCtrl()
-        } .height(48+10).margin({bottom:64+6+28})}
-
-
 
       }.align(Alignment.Bottom)
 
@@ -299,18 +293,10 @@ struct Index {
       }
     }
 
-    // 设置路由拦截
+    // 设置路由拦截：仅主 Tab 页显示底部播放条；进入任意子路由页（歌单详情/横屏等）隐藏
     this.pageInfos.setInterception({
       willShow: (from: NavDestinationContext | 'navBar', to: NavDestinationContext | 'navBar') => {
-        if (typeof from === 'string') {
-          // let target = to as NavDestinationContext;
-          // console.info(`from page is navigation home -> ${target.pathInfo.name}`);
-          this.showDynamicIsland = false
-        } else if (typeof to === 'string') {
-          // let target = from as NavDestinationContext;
-          // console.info(`${target.pathInfo.name} -> to page is navigation home`);
-          this.showDynamicIsland = true;
-        }
+        this.hidePlayerBar = typeof to !== 'string';
       }
     });
     if (deviceInfo.distributionOSApiVersion >= 60100){
@@ -321,29 +307,13 @@ struct Index {
   }
 
   @Builder
-  buildFloatingDynamicIsland() {
-    if (this.showDynamicIsland) {
-      DynamicIsland({
-        isExpanded: this.isDynamicIslandExpanded!!,
-        expandAlignment: Alignment.TopEnd,
-        compWidthCollapsed: 120,
-        compWidthExpanded: this.windowProperties.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? this.windowProperties.winWidth - 32 : 360,
-        onOpenNowPlaying: () => {
-          this.getUIContext()?.animateTo({
-            curve: curves.interpolatingSpring(0, 1, 328, 37)
-          }, () => {
-            this.isDynamicIslandExpanded = false;
-            // 不使用默认导航动画，避免叠加动画
-            this.pageInfos.pushPathByName('NowPlaying', undefined, false);
-          })
-        }
-      })
-        .position({
-          top: this.windowProperties.topRect + 4,
-          right: 16,
-        })
-        .zIndex(999)
-    }
+  buildUnifiedPlayer() {
+    // 不设 zIndex：作为顶层 Stack 最后一个子节点天然在最上层。
+    // 设 zIndex 会使其成为独立层级，破坏折叠态 hitTestBehavior(Transparent) 对下层 Tabs 的触摸透传。
+    UnifiedPlayer({
+      // 仅首页(0)/库(1) 显示播放条；Unison+(2)/我的(3) 不显示
+      visible: !this.hidePlayerBar && this.currentIndex <= 1
+    })
   }
 
   build() {
@@ -385,14 +355,22 @@ struct Index {
       })
       .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.currentIndex ===2 ?this.NullScroller:this.MyViewScroller])
       .titleMode(HdsNavigationTitleMode.MINI)
-      .onTouch(()=>{
-        this.isDynamicIslandExpanded = false;
-      })
 
 
-      this.buildFloatingDynamicIsland()
+      this.buildUnifiedPlayer()
     }
     .width("100%")
     .height("100%")
+  }
+
+  /**
+   * 返回键兜底：底部播放器展开时优先收起，避免直接退出应用
+   */
+  onBackPress(): boolean {
+    if (this.playerController.isExpanded) {
+      this.playerController.collapseRequestVersion++;
+      return true;
+    }
+    return false;
   }
 }
