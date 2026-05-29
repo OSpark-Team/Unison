@@ -56,6 +56,11 @@ export struct CustomTitleBar {
   @Param onSearchChange?: (keyword: string) => void = undefined;
 
   /**
+   * 搜索提交回调（回车 / 点击搜索按钮触发，用于「提交才搜」场景）
+   */
+  @Param onSearchSubmit?: (keyword: string) => void = undefined;
+
+  /**
    * 搜索框占位符文本
    */
   @Param searchPlaceholder: Resource = $r('app.string.search_placeholder');
@@ -82,7 +87,7 @@ export struct CustomTitleBar {
     })
       .width(this.getSearchBoxWidth())
       .onSubmit((value: string) => {
-        this.handleSearchChange(value);
+        this.handleSearchSubmit(value);
       })
       .onChange((value: string) => {
         this.handleSearchChange(value);
@@ -123,6 +128,16 @@ export struct CustomTitleBar {
     this.searchKeyword = keyword;
     if (this.onSearchChange) {
       this.onSearchChange(keyword);
+    }
+  }
+
+  /**
+   * 处理搜索提交（回车 / 搜索按钮）
+   */
+  private handleSearchSubmit(keyword: string): void {
+    this.searchKeyword = keyword;
+    if (this.onSearchSubmit) {
+      this.onSearchSubmit(keyword);
     }
   }
 

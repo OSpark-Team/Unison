@@ -15,6 +15,7 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { HdsTabs, HdsTabsAttribute, HdsTabsController } from '@kit.UIDesignKit';
 import TabSettingModel from '../model/adapter/TabSetting';
 import { UnifiedPlayer, UnifiedPlayerController } from '../components/UnifiedPlayer';
+import { SearchPageParam } from './SearchPage';
 
 @Entry
 @ComponentV2
@@ -316,6 +317,15 @@ struct Index {
     })
   }
 
+  /**
+   * 打开搜索页（携带当前数据源 id 作为默认源）
+   */
+  openSearch(): void {
+    this.pageInfos.pushPathByName("Search", {
+      sourceId: this.currentSourceViewModel.source?.id ?? ''
+    } as SearchPageParam, true);
+  }
+
   build() {
     Stack({ alignContent: Alignment.Top }) {
       HdsNavigation(this.pageInfos) {
@@ -333,6 +343,16 @@ struct Index {
           title: {
             mainTitle: "Unison",
           },
+          menu: {
+            value: [{
+              content: {
+                label: '搜索',
+                icon: $r('sys.symbol.magnifyingglass'),
+                isEnabled: true,
+                action: () => this.openSearch()
+              }
+            }]
+          },
         },
         style: {
           scrollEffectOpts: {
@@ -342,9 +362,14 @@ struct Index {
             blurEffectiveEndOffset: LengthMetrics.vp(20)
           },
           originalStyle:{
-            contentStyle:{titleStyle:{
-              mainTitleColor:$r('sys.color.font_primary')
-            }}
+            contentStyle:{
+              titleStyle:{
+                mainTitleColor:$r('sys.color.font_primary')
+              },
+              menuStyle:{
+                iconColor:$r('sys.color.font_primary')
+              }
+            }
           }
           },
         avoidLayoutSafeArea: true,
