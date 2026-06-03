@@ -400,7 +400,9 @@ export class SongPlayerManager {
         ? settingViewModel.playBitrate
         : settingViewModel.playBitrateOnData;
 
-    const detail = await source.getSongDetail(song.id, playBitrate);
+    // 注意参数顺序：getSongDetail(id, uid, br)。此前误把 playBitrate 传到了 uid 位置，
+    // 导致音质设置失效（br 永远取默认值）。这里显式传 uid，再把比特率传给 br。
+    const detail = await source.getSongDetail(song.id, source.user?.id, playBitrate);
     song.meta = detail.meta;
 
     if (!song.meta?.url) {
