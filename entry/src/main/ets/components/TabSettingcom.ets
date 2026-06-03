@@ -18,17 +18,17 @@ import { deviceInfo } from "@kit.BasicServicesKit";
 export default struct TabSettingCom {
   // 材质类型选择选项列表：无材质、自适应模式、沉浸式材质
   @Local TypeSelectOptions: SelectOption[] = [
-    { value: '无材质' },
-    { value: '自适应模式' },
-    { value: '沉浸式材质' }
+    { value: $r('app.string.tab_material_none') },
+    { value: $r('app.string.tab_material_adaptive') },
+    { value: $r('app.string.tab_material_immersive') }
   ]
 
   // 材质等级选择选项列表：精美、轻柔、流畅、自适应模式
   @Local LevelSelectOptions: SelectOption[] = [
-    { value: '精美' },
-    { value: '轻柔' },
-    { value: '流畅' },
-    { value: '自适应模式' }
+    { value: $r('app.string.tab_material_level_exquisite') },
+    { value: $r('app.string.tab_material_level_soft') },
+    { value: $r('app.string.tab_material_level_smooth') },
+    { value: $r('app.string.tab_material_adaptive') }
   ]
 
   // Tab设置数据模型，通过PersistenceV2实现数据持久化存储
@@ -68,13 +68,13 @@ export default struct TabSettingCom {
    */
   private getTypeLabel(bitrate: number): ResourceStr {
     if (bitrate === 0) {
-      return '无材质';
+      return $r('app.string.tab_material_none');
     }
     if (bitrate === 100) {
-      return '自适应模式';
+      return $r('app.string.tab_material_adaptive');
     }
     if (bitrate === 101) {
-      return '沉浸式材质';
+      return $r('app.string.tab_material_immersive');
     }
     // 非标准值时直接显示数值
     return String(bitrate);
@@ -88,7 +88,7 @@ export default struct TabSettingCom {
   private TypeSelectRow() {
     Row({ space: 12 }) {
       // 左侧标签文本
-      Text('材质类型')
+      Text($r('app.string.tab_setting_material_type'))
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor($r('app.color.text_primary'))
@@ -143,16 +143,16 @@ export default struct TabSettingCom {
    */
   private getLevelLabel(bitrate: number): ResourceStr {
     if (bitrate === 0) {
-      return '精美';
+      return $r('app.string.tab_material_level_exquisite');
     }
     if (bitrate === 1) {
-      return '轻柔';
+      return $r('app.string.tab_material_level_soft');
     }
     if (bitrate === 2) {
-      return '流畅';
+      return $r('app.string.tab_material_level_smooth');
     }
     if (bitrate === 10) {
-      return '自适应模式';
+      return $r('app.string.tab_material_adaptive');
     }
     // 非标准值时直接显示数值
     return String(bitrate);
@@ -166,7 +166,7 @@ export default struct TabSettingCom {
   private LevelSelectRow() {
     Row({ space: 12 }) {
       // 左侧标签文本
-      Text('材质等级')
+      Text($r('app.string.tab_setting_material_level'))
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .fontColor($r('app.color.text_primary'))
@@ -200,7 +200,7 @@ export default struct TabSettingCom {
         SettingItem({
           type: 'switch',
           icon: undefined,
-          title: '悬浮状态栏',
+          title: $r('app.string.tab_setting_floating_status_bar'),
           description: undefined,
           value: this.TabSettingModel.barFloatingStyle,
           onChange: (value: boolean) => {
@@ -220,7 +220,7 @@ export default struct TabSettingCom {
           SettingItem({
             type: 'switch',
             icon: undefined,
-            title: '选中背景色',
+            title: $r('app.string.tab_setting_selected_bg_color'),
             description: undefined,
             value: this.TabSettingModel.useBackgroundColor,
             onChange: (value: boolean) => {
