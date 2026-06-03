@@ -18,6 +18,11 @@ import LrcParser, { LyricLine, LyricToken, ParsedLrc } from "../utils/LrcParser"
 import CurrentSourceViewModel from "../viewmodel/CurrentSourceViewModel";
 import PlaylistViewModel from "../viewmodel/PlaylistViewModel";
 import SettingViewModel from "../viewmodel/SettingViewModel";
+import { SourceListViewModel } from "../viewmodel/SourceListViewModel";
+import { Song } from "../model/adapter/Song";
+import { Playlist } from "../model/adapter/Playlist";
+import { PlaylistSelectorSheet } from "./PlaylistSelectorSheet";
+import { AddToPlaylistController, toggleSongFavorite } from "../utils/SongActions";
 
 const TAG: string = "UnifiedPlayer";
 
@@ -145,6 +150,13 @@ export struct UnifiedPlayer {
     "UnifiedPlayerController",
     () => new UnifiedPlayerController(),
   )!;
+  @Local sourceListViewModel: SourceListViewModel = AppStorageV2.connect(
+    SourceListViewModel,
+    "SourceListViewModel",
+    () => new SourceListViewModel(),
+  )!;
+  /** 「添加到歌单」控制器（顶栏当前歌 / 队列项复用） */
+  @Local addCtrl: AddToPlaylistController = new AddToPlaylistController();
 
   /** 展开进度：0=折叠，1=展开。拖动实时更新（跟手），松手 animateTo 吸附。 */
   @Local expandProgress: number = 0;
@@ -495,6 +507,28 @@ export struct UnifiedPlayer {
     this.showSheet = false;
   }
 
+  /** 打开「添加到歌单」面板（顶栏当前歌 / 队列项共用） */
+  private openAddToPlaylist(song: Song): void {
+    this.openSheet("addToPlaylist");
+    this.addCtrl.open(song, this.sourceListViewModel.sources);
+  }
+
+  /** 切换歌曲收藏（喜欢）状态并 Toast 反馈 */
+  private async favoriteSong(song: Song): Promise<void> {
+    const r = await toggleSongFavorite(song, this.sourceListViewModel.sources);
+    if (r !== null) {
+      this.getUIContext().getPromptAction().showToast({
+        message: r ? $r('app.string.toast_favorited') : $r('app.string.toast_unfavorited')
+      });
+    }
+  }
+
+  private toastAdd(ok: boolean): void {
+    this.getUIContext().getPromptAction().showToast({
+      message: ok ? $r('app.string.toast_added_to_playlist') : $r('app.string.toast_operation_failed')
+    });
+  }
+
   private mapModeResource(mode: avSession.LoopMode): Resource {
     switch (mode) {
       case avSession.LoopMode.LOOP_MODE_LIST:
@@ -838,6 +872,37 @@ export struct UnifiedPlayer {
     return this.windowProperties.winHeight - this.tabReserved - COLLAPSED_BAR_H;
   }
 
+  /** 折叠条宽度：悬浮模式与悬浮 Tab 同宽（居中窄条）；非悬浮保持近全宽 */
+  @Computed
+  get foldedBarWidth(): number {
+    if (!this.tabSettingModel.barFloatingStyle) {
+      return this.windowProperties.winWidth - 2 * SIDE_MARGIN;
+    }
+    const bp = this.windowProperties.currentBreakpoint;
+    if (bp === BreakpointConstants.BREAKPOINT_LG) {
+      return 500;
+    }
+    if (bp === BreakpointConstants.BREAKPOINT_MD) {
+      return 400;
+    }
+    return 300;
+  }
+
+  /** 折叠条左边界：悬浮模式水平居中；非悬浮贴左 SIDE_MARGIN */
+  @Computed
+  get foldedBarLeft(): number {
+    if (!this.tabSettingModel.barFloatingStyle) {
+      return SIDE_MARGIN;
+    }
+    return (this.windowProperties.winWidth - this.foldedBarWidth) / 2;
+  }
+
+  /** 折叠条右边界 */
+  @Computed
+  get foldedBarRight(): number {
+    return this.foldedBarLeft + this.foldedBarWidth;
+  }
+
   @Computed
   get expCoverSize(): number {
     if (this.isSm) {
@@ -861,7 +926,7 @@ export struct UnifiedPlayer {
 
   @Computed
   get collapsedTitleX(): number {
-    return SIDE_MARGIN + COVER_LEFT_PAD + COLLAPSED_COVER + 12;
+    return this.foldedBarLeft + COVER_LEFT_PAD + COLLAPSED_COVER + 12;
   }
 
   @Computed
@@ -920,7 +985,7 @@ export struct UnifiedPlayer {
 
   @Computed
   get foldedPlayCenterX(): number {
-    return this.windowProperties.winWidth - SIDE_MARGIN - 12 - 88 + 20;
+    return this.foldedBarRight - 12 - 88 + 20;
   }
 
   @Computed
@@ -951,11 +1016,18 @@ export struct UnifiedPlayer {
   @Builder
   buildBackgroundCard() {
     Stack({ alignContent: Alignment.Center }) {
-      // 深色不透明底：承载元素、中间态不透出下层
+      // 折叠态：半透明深色 + 背景模糊 = 高级毛玻璃质感（透出并模糊下层内容）
+      Column()
+        .width("100%")
+        .height("100%")
+        .backgroundColor("#730B0B10")
+        .backgroundBlurStyle(BlurStyle.BACKGROUND_THICK)
+      // 展开态：不透明深色随展开渐显盖住毛玻璃，确保全屏播放页不透出下层
       Column()
         .width("100%")
         .height("100%")
         .backgroundColor("#0B0B10")
+        .opacity(this.expandProgress)
 
       // 模糊封面（后段渐显）
       if (this.playlistViewModel.currentSong?.album?.cover) {
@@ -1017,10 +1089,10 @@ export struct UnifiedPlayer {
         .backgroundColor("#22000000")
         .opacity(this.glowFactor)
     }
-    .width(this.lerp(this.windowProperties.winWidth - 2 * SIDE_MARGIN, this.windowProperties.winWidth, this.expandProgress))
+    .width(this.lerp(this.foldedBarWidth, this.windowProperties.winWidth, this.expandProgress))
     .height(this.lerp(COLLAPSED_BAR_H, this.windowProperties.winHeight, this.expandProgress))
     .position({
-      x: this.lerp(SIDE_MARGIN, 0, this.expandProgress),
+      x: this.lerp(this.foldedBarLeft, 0, this.expandProgress),
       y: this.lerp(this.collapsedBarTop, 0, this.expandProgress),
     })
     .borderRadius(this.lerp(16, 0, this.expandProgress))
@@ -1068,7 +1140,7 @@ export struct UnifiedPlayer {
     }
     .height(COLLAPSED_BAR_H)
     .position({
-      x: this.windowProperties.winWidth - SIDE_MARGIN - 12 - 88,
+      x: this.foldedBarRight - 12 - 88,
       y: this.collapsedBarTop,
     })
     .opacity(this.collapsedButtonOpacity);
@@ -1086,7 +1158,7 @@ export struct UnifiedPlayer {
       )
       .objectFit(ImageFit.Cover)
       .position({
-        x: this.lerp(SIDE_MARGIN + COVER_LEFT_PAD, this.expCoverX, this.expandProgress),
+        x: this.lerp(this.foldedBarLeft + COVER_LEFT_PAD, this.expCoverX, this.expandProgress),
         y: this.lerp(this.collapsedCoverY, this.expCoverY, this.expandProgress),
       })
       .shadow({
@@ -1336,6 +1408,25 @@ export struct UnifiedPlayer {
       .backgroundColor("#1AFFFFFF")
       .clickEffect({ level: ClickEffectLevel.LIGHT, scale: this.settingModel.scalePress })
       .bindMenu([
+        {
+          value: $r("app.string.playlist_add_to"),
+          action: () => {
+            const s = this.playlistViewModel.currentSong;
+            if (s) {
+              this.openAddToPlaylist(s);
+            }
+          },
+        },
+        {
+          value: this.playlistViewModel.currentSong?.meta?.isFavorite
+            ? $r("app.string.action_unfavorite") : $r("app.string.action_favorite"),
+          action: () => {
+            const s = this.playlistViewModel.currentSong;
+            if (s) {
+              this.favoriteSong(s);
+            }
+          },
+        },
         {
           value: $r("app.string.now_playing_landscape_mode"),
           action: () => this.openLandscapePage(),
@@ -1587,7 +1678,13 @@ export struct UnifiedPlayer {
       .height(64)
       .position({ x: this.expTitleX, y: this.expTitleY })
       .opacity(this.isFullyExpanded ? 1 : 0)
-      // 控制区已移出 Swiper（见 buildFullContent 固定层），此处仅留封面+歌名随页滑动
+      // 控制区只在封面页（随封面页一起被滑走）；歌词页是纯歌词。
+      Column() {
+        this.buildControls()
+      }
+      .width("100%")
+      .padding({ left: 32, right: 32 })
+      .position({ x: 0, y: this.contentTop })
     }
     .width("100%")
     .height("100%");
@@ -1604,8 +1701,9 @@ export struct UnifiedPlayer {
       .width("100%")
     }
     .width("100%")
-    // 歌词只占 contentTop 以上：控制区已移出 Swiper 固定在下半，歌词避让避免被遮挡
-    .height(this.contentTop);
+    .height("100%")
+    .padding({ bottom: this.windowProperties.bottomRect + 24 })
+    .clip(true);
   }
 
   // ── 子构建器：宽屏（MD/LG）左右分栏，封面/歌名用持久节点 ──────────────────────
@@ -1680,15 +1778,6 @@ export struct UnifiedPlayer {
         .justifyContent(FlexAlign.Center)
         .hitTestBehavior(HitTestMode.None)
         .opacity(this.contentFactor)
-
-        // 控制区固定在播放页下半（移出 Swiper）：根治 play/next 等按钮与 Swiper 水平滑动竞争导致的「点不动」，
-        // 且封面页/歌词页都常驻控制区。位置 contentTop 与持久飞行 play/next 落点一致，交接无缝。
-        Column() {
-          this.buildControls()
-        }
-        .width("100%")
-        .padding({ left: 32, right: 32 })
-        .position({ x: 0, y: this.contentTop })
       } else {
         this.buildWideFull()
       }
@@ -1703,7 +1792,8 @@ export struct UnifiedPlayer {
     })
     .bindSheet($$this.showSheet, this.buildDynamicSheet(), {
       height:
-        this.sheetType === "queue" || this.sheetType === "sleepTimer" ? SheetSize.MEDIUM : SheetSize.LARGE,
+        this.sheetType === "queue" || this.sheetType === "sleepTimer" || this.sheetType === "addToPlaylist"
+          ? SheetSize.MEDIUM : SheetSize.LARGE,
       showClose: false,
       preferType: SheetType.CENTER,
       onWillDismiss: () => {
@@ -1724,6 +1814,8 @@ export struct UnifiedPlayer {
         this.playlistViewModel.playSongByIndex(index, true);
         this.closeSheet();
       },
+      onAddToPlaylist: (song: Song) => this.openAddToPlaylist(song),
+      onFavorite: (song: Song) => this.favoriteSong(song),
       onClose: () => {
         this.closeSheet();
       },
@@ -1749,6 +1841,23 @@ export struct UnifiedPlayer {
   }
 
   @Builder
+  buildAddToPlaylistSheet() {
+    PlaylistSelectorSheet({
+      playlists: this.addCtrl.candidates,
+      isLoading: this.addCtrl.loading,
+      onSelect: (pl: Playlist) => {
+        this.closeSheet();
+        this.addCtrl.select(pl).then((ok: boolean) => this.toastAdd(ok));
+      },
+      onCreateNew: (name: string) => {
+        this.closeSheet();
+        this.addCtrl.createAndAdd(name).then((ok: boolean) => this.toastAdd(ok));
+      },
+      onClose: () => this.closeSheet(),
+    });
+  }
+
+  @Builder
   buildDynamicSheet() {
     if (this.sheetType === "queue") {
       this.buildQueueSheet();
@@ -1756,6 +1865,8 @@ export struct UnifiedPlayer {
       this.buildAudioEffectsSheet();
     } else if (this.sheetType === "sleepTimer") {
       this.buildSleepTimerSheet();
+    } else if (this.sheetType === "addToPlaylist") {
+      this.buildAddToPlaylistSheet();
     } else {
       Column()
         .width("100%")
