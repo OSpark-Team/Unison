@@ -235,7 +235,7 @@ export default class OMSPAdapter {
     pid: number | string,
     sids: Array<number | string>,
   ) {
-    await instance.post(`/playlist/songs?pid=${pid}&sid=${sids.join(",")}`);
+    await instance.post(`/playlist/songs?pid=${pid}&sids=${sids.join(",")}`);
   }
 
   /**

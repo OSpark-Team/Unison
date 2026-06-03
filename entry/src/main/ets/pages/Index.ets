@@ -16,6 +16,8 @@ import { HdsTabs, HdsTabsAttribute, HdsTabsController } from '@kit.UIDesignKit';
 import TabSettingModel from '../model/adapter/TabSetting';
 import { UnifiedPlayer, UnifiedPlayerController } from '../components/UnifiedPlayer';
 import { SearchPageParam } from './SearchPage';
+import { PlaylistSelectorSheet } from '../components/PlaylistSelectorSheet';
+import { Playlist } from '../model/adapter/Playlist';
 
 @Entry
 @ComponentV2
@@ -57,6 +59,9 @@ struct Index {
    */
   @Local playerController: UnifiedPlayerController =
     AppStorageV2.connect(UnifiedPlayerController, "UnifiedPlayerController", () => new UnifiedPlayerController())!;
+
+  /** 库页歌单管理面板（新建歌单）显隐 */
+  @Local playlistMgrShown: boolean = false;
 
 
   private  HomeViewScroller: Scroller = new Scroller(); //HomeView 滚动容器控制器
@@ -326,6 +331,50 @@ struct Index {
     } as SearchPageParam, true);
   }
 
+  /** 打开歌单管理面板（库页「新建歌单」入口） */
+  openPlaylistManager(): void {
+    this.playlistMgrShown = true;
+  }
+
+  /** 新建歌单（当前数据源）并刷新用户歌单 */
+  private async handleCreatePlaylist(name: string): Promise<void> {
+    const source = this.currentSourceViewModel.source;
+    if (!source) {
+      return;
+    }
+    try {
+      await source.createPlaylist(name);
+      await this.currentSourceViewModel.refreshUserPlaylists();
+      this.getUIContext().getPromptAction().showToast({ message: $r('app.string.toast_playlist_created') });
+    } catch (e) {
+      this.getUIContext().getPromptAction().showToast({ message: $r('app.string.toast_operation_failed') });
+    }
+  }
+
+  /** 点击面板中的歌单 → 进入歌单详情 */
+  private handleSelectPlaylistInMgr(pl: Playlist): void {
+    this.playlistMgrShown = false;
+    this.pageInfos.pushPathByName("PlaylistDetail", {
+      playlistId: pl.id.toString(),
+      sourceId: pl.sourceId,
+      playlist: pl
+    } as PlaylistDetailParam, true);
+  }
+
+  @Builder
+  buildPlaylistManagerSheet() {
+    PlaylistSelectorSheet({
+      title: $r('app.string.playlist_create_new'),
+      playlists: this.currentSourceViewModel.userPlaylists,
+      isLoading: false,
+      onSelect: (pl: Playlist) => this.handleSelectPlaylistInMgr(pl),
+      onCreateNew: (name: string) => this.handleCreatePlaylist(name),
+      onClose: () => {
+        this.playlistMgrShown = false;
+      }
+    })
+  }
+
   build() {
     Stack({ alignContent: Alignment.Top }) {
       HdsNavigation(this.pageInfos) {
@@ -344,14 +393,36 @@ struct Index {
             mainTitle: "Unison",
           },
           menu: {
-            value: [{
-              content: {
-                label: '搜索',
-                icon: $r('sys.symbol.magnifyingglass'),
-                isEnabled: true,
-                action: () => this.openSearch()
-              }
-            }]
+            // 库页(1)额外提供「新建歌单」入口
+            value: this.currentIndex === 1
+              ? [
+                  {
+                    content: {
+                      label: 'new_playlist',
+                      icon: $r('sys.symbol.plus'),
+                      isEnabled: true,
+                      action: () => this.openPlaylistManager()
+                    }
+                  },
+                  {
+                    content: {
+                      label: 'search',
+                      icon: $r('sys.symbol.magnifyingglass'),
+                      isEnabled: true,
+                      action: () => this.openSearch()
+                    }
+                  }
+                ]
+              : [
+                  {
+                    content: {
+                      label: 'search',
+                      icon: $r('sys.symbol.magnifyingglass'),
+                      isEnabled: true,
+                      action: () => this.openSearch()
+                    }
+                  }
+                ]
           },
         },
         style: {
@@ -380,6 +451,14 @@ struct Index {
       })
       .bindToScrollable([this.currentIndex === 0 ? this.HomeViewScroller:this.currentIndex ===1?this.LibraryViewScroller:this.currentIndex ===2 ?this.NullScroller:this.MyViewScroller])
       .titleMode(HdsNavigationTitleMode.MINI)
+      .bindSheet($$this.playlistMgrShown, this.buildPlaylistManagerSheet(), {
+        height: SheetSize.MEDIUM,
+        showClose: false,
+        preferType: SheetType.CENTER,
+        onWillDismiss: () => {
+          this.playlistMgrShown = false;
+        }
+      })
 
 
       this.buildUnifiedPlayer()

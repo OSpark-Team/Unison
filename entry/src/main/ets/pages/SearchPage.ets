@@ -8,6 +8,7 @@ import { CustomTitleBar } from '../components/CustomTitleBar';
 import { SongListItem } from '../components/SongListItem';
 import { PlaylistListItem } from '../components/PlaylistListItem';
 import { ArtistListItem } from '../components/ArtistListItem';
+import { PlaylistSelectorSheet } from '../components/PlaylistSelectorSheet';
 import { Song } from '../model/adapter/Song';
 import { Playlist } from '../model/adapter/Playlist';
 import { Artist } from '../model/adapter/Artist';
@@ -16,12 +17,10 @@ import { Source } from '../model/Source';
 import { SearchResponse } from '../adapter/omsp';
 import { cover } from '../utils/Tools';
 import { PlaylistDetailParam } from './PlaylistDetail';
+import { filterAddablePlaylists, toggleSongFavorite } from '../utils/SongActions';
 import Logger from '../utils/Logger';
 
 const TAG = 'SearchPage';
-
-/** 分类 Tab 标题 */
-const TAB_TITLES: string[] = ['歌曲', '歌单', '艺术家', '专辑'];
 
 /**
  * 搜索页面参数
@@ -74,6 +73,13 @@ struct SearchPage {
   @Local artists: Artist[] = [];
   @Local albums: Album[] = [];
 
+  // ── 添加到歌单 ──
+  @Local addSheetShown: boolean = false;
+  @Local addLoading: boolean = false;
+  @Local candidatePlaylists: Playlist[] = [];
+  private targetSong: Song | null = null;
+  private targetSource: Source | null = null;
+
   private param: SearchPageParam = {};
   private tabsController: TabsController = new TabsController();
 
@@ -81,11 +87,11 @@ struct SearchPage {
    * 当前选中数据源的显示名
    */
   @Computed
-  get currentSourceLabel(): string {
+  get currentSourceLabel(): ResourceStr {
     if (this.selectedSourceIndex === 0) {
-      return '全部数据源';
+      return $r('app.string.search_all_sources');
     }
-    return this.sourceListViewModel.sources[this.selectedSourceIndex - 1]?.name ?? '全部数据源';
+    return this.sourceListViewModel.sources[this.selectedSourceIndex - 1]?.name ?? $r('app.string.search_all_sources');
   }
 
   /**
@@ -93,7 +99,7 @@ struct SearchPage {
    */
   private getSourceMenuItems(): MenuElement[] {
     const items: MenuElement[] = [{
-      value: '全部数据源',
+      value: $r('app.string.search_all_sources'),
       action: () => this.onSourceSelect(0)
     }];
     this.sourceListViewModel.sources.forEach((s: Source, i: number) => {
@@ -178,6 +184,17 @@ struct SearchPage {
     return song.artists?.map((a: Artist) => a.name).join(' / ') ?? '';
   }
 
+  /** 分类 Tab 标题（国际化） */
+  private tabTitle(index: number): ResourceStr {
+    switch (index) {
+      case 0: return $r('app.string.search_tab_songs');
+      case 1: return $r('app.string.search_tab_playlists');
+      case 2: return $r('app.string.search_tab_artists');
+      case 3: return $r('app.string.search_tab_albums');
+      default: return '';
+    }
+  }
+
   /** 点击歌曲：插入到队列最前并立即播放 */
   private playSongNow(song: Song): void {
     this.playlistViewModel.insertSongs([song], 0);
@@ -190,15 +207,99 @@ struct SearchPage {
     this.playlistViewModel.insertSongs([song], nextIndex);
   }
 
+  private toast(msg: ResourceStr): void {
+    this.getUIContext().getPromptAction().showToast({ message: msg });
+  }
+
+  /** 菜单：收藏 / 取消收藏（切换「我喜欢的音乐」状态） */
+  private async toggleFavorite(song: Song): Promise<void> {
+    const r = await toggleSongFavorite(song, this.sourceListViewModel.sources);
+    if (r !== null) {
+      this.toast(r ? $r('app.string.toast_favorited') : $r('app.string.toast_unfavorited'));
+    }
+  }
+
+  /** 菜单：添加到歌单 —— 按歌曲 sourceId 找数据源，加载其用户歌单后弹出选择面板 */
+  private async openAddToPlaylist(song: Song): Promise<void> {
+    const source = this.sourceListViewModel.sources.find((s: Source) => s.id === song.sourceId);
+    if (!source) {
+      return;
+    }
+    this.targetSong = song;
+    this.targetSource = source;
+    this.candidatePlaylists = [];
+    this.addLoading = true;
+    this.addSheetShown = true;
+    try {
+      const all = await source.getUserPlaylists(source.user?.id ?? 0);
+      this.candidatePlaylists = filterAddablePlaylists(all, source.user);
+    } catch (e) {
+      Logger.error(TAG, `加载用户歌单失败: ${e}`);
+    } finally {
+      this.addLoading = false;
+    }
+  }
+
+  /** 选中歌单 → 把目标歌曲加进去 */
+  private async handleSelectPlaylist(playlist: Playlist): Promise<void> {
+    if (!this.targetSource || !this.targetSong) {
+      return;
+    }
+    this.addSheetShown = false;
+    try {
+      await this.targetSource.addSongsToPlaylist(playlist.id, [this.targetSong.id]);
+      this.toast($r('app.string.toast_added_to_playlist'));
+    } catch (e) {
+      Logger.error(TAG, `添加到歌单失败: ${e}`);
+      this.toast($r('app.string.toast_operation_failed'));
+    }
+  }
+
+  /** 新建歌单并把目标歌曲加进去 */
+  private async handleCreateAndAdd(name: string): Promise<void> {
+    if (!this.targetSource || !this.targetSong) {
+      return;
+    }
+    try {
+      const created = await this.targetSource.createPlaylist(name);
+      await this.targetSource.addSongsToPlaylist(created.id, [this.targetSong.id]);
+      this.addSheetShown = false;
+      this.toast($r('app.string.toast_added_to_playlist'));
+    } catch (e) {
+      Logger.error(TAG, `新建歌单并添加失败: ${e}`);
+      this.toast($r('app.string.toast_operation_failed'));
+    }
+  }
+
   /** 歌曲长按菜单 */
   @Builder
   buildSongMenu(song: Song) {
     Menu() {
-      MenuItem({ startIcon: $r('sys.symbol.play_fill'), content: '立即播放' })
+      MenuItem({ startIcon: $r('sys.symbol.play_fill'), content: $r('app.string.action_play_now') })
         .onClick(() => this.playSongNow(song))
-      MenuItem({ startIcon: $r('sys.symbol.plus'), content: '添加到下一首播放' })
+      MenuItem({ startIcon: $r('sys.symbol.plus'), content: $r('app.string.action_add_next') })
         .onClick(() => this.addToPlayNext(song))
+      MenuItem({
+        startIcon: song.meta?.isFavorite ? $r('sys.symbol.heart_fill') : $r('sys.symbol.heart'),
+        content: song.meta?.isFavorite ? $r('app.string.action_unfavorite') : $r('app.string.action_favorite')
+      })
+        .onClick(() => this.toggleFavorite(song))
+      MenuItem({ startIcon: $r('sys.symbol.music_note_list'), content: $r('app.string.playlist_add_to') })
+        .onClick(() => this.openAddToPlaylist(song))
     }
+  }
+
+  @Builder
+  buildAddToPlaylistSheet() {
+    PlaylistSelectorSheet({
+      playlists: this.candidatePlaylists,
+      isLoading: this.addLoading,
+      onSelect: (pl: Playlist) => this.handleSelectPlaylist(pl),
+      onCreateNew: (name: string) => this.handleCreateAndAdd(name),
+      onClose: () => {
+        this.addSheetShown = false;
+      }
+    })
   }
 
   private openPlaylist(pl: Playlist): void {
@@ -268,7 +369,7 @@ struct SearchPage {
   @Builder
   tabBarBuilder(index: number) {
     Column({ space: 6 }) {
-      Text(TAB_TITLES[index])
+      Text(this.tabTitle(index))
         .fontSize(16)
         .fontWeight(this.activeTab === index ? FontWeight.Bold : FontWeight.Normal)
         .fontColor(this.activeTab === index ? $r('app.color.text_primary') : $r('app.color.text_secondary'))
@@ -380,19 +481,19 @@ struct SearchPage {
           .width(44)
           .height(44)
           .color($r('app.color.accent'))
-        Text('搜索中…')
+        Text($r('app.string.search_loading'))
           .fontSize(14)
           .fontColor($r('app.color.text_secondary'))
       } else {
         SymbolGlyph($r('sys.symbol.magnifyingglass'))
           .fontSize(56)
           .fontColor([$r('app.color.library_empty_icon')])
-        Text(this.hasSearched ? '没有找到相关结果' : '输入关键词后回车开始搜索')
+        Text(this.hasSearched ? $r('app.string.search_empty_result') : $r('app.string.search_empty_hint'))
           .fontSize(15)
           .fontWeight(FontWeight.Medium)
           .fontColor($r('app.color.text_primary'))
         if (!this.hasSearched) {
-          Text('支持搜索歌曲、歌单、艺术家、专辑')
+          Text($r('app.string.search_empty_sub'))
             .fontSize(13)
             .fontColor($r('app.color.text_secondary'))
         }
@@ -477,6 +578,14 @@ struct SearchPage {
       }
       .width('100%')
       .height('100%')
+      .bindSheet($$this.addSheetShown, this.buildAddToPlaylistSheet(), {
+        height: SheetSize.MEDIUM,
+        showClose: false,
+        preferType: SheetType.CENTER,
+        onWillDismiss: () => {
+          this.addSheetShown = false;
+        }
+      })
     }
     .mode(NavDestinationMode.STANDARD)
     .hideTitleBar(true)

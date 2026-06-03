@@ -1,6 +1,158 @@
 {
   "string": [
     {
+      "name": "tab_setting_floating_status_bar",
+      "value": "悬浮状态栏"
+    },
+    {
+      "name": "tab_setting_selected_bg_color",
+      "value": "选中背景色"
+    },
+    {
+      "name": "tab_setting_material_type",
+      "value": "材质类型"
+    },
+    {
+      "name": "tab_setting_material_level",
+      "value": "材质等级"
+    },
+    {
+      "name": "tab_material_none",
+      "value": "无材质"
+    },
+    {
+      "name": "tab_material_adaptive",
+      "value": "自适应模式"
+    },
+    {
+      "name": "tab_material_immersive",
+      "value": "沉浸式材质"
+    },
+    {
+      "name": "tab_material_level_exquisite",
+      "value": "精美"
+    },
+    {
+      "name": "tab_material_level_soft",
+      "value": "轻柔"
+    },
+    {
+      "name": "tab_material_level_smooth",
+      "value": "流畅"
+    },
+    {
+      "name": "playlist_add_to",
+      "value": "添加到歌单"
+    },
+    {
+      "name": "playlist_create_new",
+      "value": "新建歌单"
+    },
+    {
+      "name": "playlist_name_hint",
+      "value": "输入歌单名称"
+    },
+    {
+      "name": "playlist_selector_empty",
+      "value": "还没有歌单，点上方新建一个"
+    },
+    {
+      "name": "playlist_remove_from",
+      "value": "从歌单移除"
+    },
+    {
+      "name": "toast_added_to_playlist",
+      "value": "已添加到歌单"
+    },
+    {
+      "name": "toast_removed_from_playlist",
+      "value": "已从歌单移除"
+    },
+    {
+      "name": "toast_playlist_created",
+      "value": "歌单已创建"
+    },
+    {
+      "name": "toast_operation_failed",
+      "value": "操作失败，请重试"
+    },
+    {
+      "name": "common_create",
+      "value": "创建"
+    },
+    {
+      "name": "search_tab_songs",
+      "value": "歌曲"
+    },
+    {
+      "name": "search_tab_playlists",
+      "value": "歌单"
+    },
+    {
+      "name": "search_tab_artists",
+      "value": "艺术家"
+    },
+    {
+      "name": "search_tab_albums",
+      "value": "专辑"
+    },
+    {
+      "name": "search_all_sources",
+      "value": "全部数据源"
+    },
+    {
+      "name": "search_loading",
+      "value": "搜索中…"
+    },
+    {
+      "name": "search_empty_result",
+      "value": "没有找到相关结果"
+    },
+    {
+      "name": "search_empty_hint",
+      "value": "输入关键词后回车开始搜索"
+    },
+    {
+      "name": "search_empty_sub",
+      "value": "支持搜索歌曲、歌单、艺术家、专辑"
+    },
+    {
+      "name": "action_play_now",
+      "value": "立即播放"
+    },
+    {
+      "name": "action_add_next",
+      "value": "添加到下一首播放"
+    },
+    {
+      "name": "action_favorite",
+      "value": "收藏到我喜欢"
+    },
+    {
+      "name": "action_unfavorite",
+      "value": "取消喜欢"
+    },
+    {
+      "name": "toast_favorited",
+      "value": "已收藏到我喜欢"
+    },
+    {
+      "name": "toast_unfavorited",
+      "value": "已取消收藏"
+    },
+    {
+      "name": "library_tab_playlists",
+      "value": "歌单"
+    },
+    {
+      "name": "library_tab_albums",
+      "value": "专辑"
+    },
+    {
+      "name": "subscribed_albums_empty",
+      "value": "还没有收藏的专辑"
+    },
+    {
       "name": "module_desc",
       "value": "module description"
     },

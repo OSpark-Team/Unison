@@ -7,7 +7,11 @@ import { Song } from '../model/adapter/Song';
 import { PlaylistInfoCard } from '../components/PlaylistInfoCard';
 import { PlaylistSongGrid } from '../components/PlaylistSongGrid';
 import { CustomTitleBar } from '../components/CustomTitleBar';
+import { PlaylistSelectorSheet } from '../components/PlaylistSelectorSheet';
+import { Source } from '../model/Source';
+import { promptAction } from '@kit.ArkUI';
 import Logger from '../utils/Logger';
+import { filterAddablePlaylists, isOwnedPlaylist, toggleSongFavorite } from '../utils/SongActions';
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { ContinueSwitch } from '../utils/Continue';
 import { PersistenceV2 } from '@kit.ArkUI';
@@ -105,6 +109,13 @@ struct PlaylistDetail {
    * 错误状态
    */
   @Local hasError: boolean = false;
+
+  // ── 添加到歌单 ──
+  @Local addSheetShown: boolean = false;
+  @Local addLoading: boolean = false;
+  @Local candidatePlaylists: Playlist[] = [];
+  private targetSong: Song | null = null;
+  private targetSource: Source | null = null;
 
   /**
    * 错误信息
@@ -296,7 +307,12 @@ struct PlaylistDetail {
         throw new Error(`未找到数据源: ${this.playlist.sourceId}`);
       }
 
-      if (this.playlist.meta?.subscribed) {
+      // 按类型分流：专辑用 likeAlbum，歌单用 subscribePlaylist
+      // （修复：此前专辑也误调 subscribePlaylist，导致 likeAlbum 从未被使用）
+      const subscribed: boolean = this.playlist.meta?.subscribed ?? false;
+      if (this.playlist.type === "album") {
+        await source.likeAlbum(this.playlist.id, !subscribed);
+      } else if (subscribed) {
         await source.unsubscribePlaylist(this.playlist.id);
       } else {
         await source.subscribePlaylist(this.playlist.id);
@@ -351,7 +367,129 @@ struct PlaylistDetail {
    */
   private handleSongLongPress(song: Song, index: number): void {
     Logger.info(TAG, `长按歌曲: ${song.name}, 索引: ${index}`);
-    // TODO: 实现歌曲操作菜单
+    // 仅「自己创建的普通歌单」才显示「从歌单移除」；专辑 / 收藏的歌单 / key_ 特殊歌单不显示
+    const source = this.viewModel.sources.find((s: Source) => s.id === this.playlist.sourceId);
+    const owned: boolean = isOwnedPlaylist(this.playlist, source?.user);
+    const favText: ResourceStr = song.meta?.isFavorite
+      ? $r('app.string.action_unfavorite') : $r('app.string.action_favorite');
+    const handle = (result: promptAction.ActionMenuSuccessResponse): void => {
+      if (result.index === 0) {
+        this.toggleFavorite(song);
+      } else if (result.index === 1) {
+        this.openAddToPlaylist(song);
+      } else if (result.index === 2) {
+        this.removeSongFromPlaylist(song);
+      }
+    };
+    if (owned) {
+      this.getUIContext().getPromptAction().showActionMenu({
+        title: song.name ?? '',
+        buttons: [
+          { text: favText, color: $r('app.color.text_primary') },
+          { text: $r('app.string.playlist_add_to'), color: $r('app.color.text_primary') },
+          { text: $r('app.string.playlist_remove_from'), color: $r('app.color.error') },
+        ]
+      }).then(handle).catch(() => {});
+    } else {
+      this.getUIContext().getPromptAction().showActionMenu({
+        title: song.name ?? '',
+        buttons: [
+          { text: favText, color: $r('app.color.text_primary') },
+          { text: $r('app.string.playlist_add_to'), color: $r('app.color.text_primary') },
+        ]
+      }).then(handle).catch(() => {});
+    }
+  }
+
+  /** 长按菜单：收藏 / 取消收藏（切换「我喜欢的音乐」状态） */
+  private async toggleFavorite(song: Song): Promise<void> {
+    const r = await toggleSongFavorite(song, this.viewModel.sources);
+    if (r !== null) {
+      this.toast(r ? $r('app.string.toast_favorited') : $r('app.string.toast_unfavorited'));
+    }
+  }
+
+  private toast(msg: ResourceStr): void {
+    this.getUIContext().getPromptAction().showToast({ message: msg });
+  }
+
+  /** 添加到歌单：加载歌曲所属源的用户歌单，弹出选择面板 */
+  private async openAddToPlaylist(song: Song): Promise<void> {
+    const source = this.viewModel.sources.find((s: Source) => s.id === song.sourceId);
+    if (!source) {
+      return;
+    }
+    this.targetSong = song;
+    this.targetSource = source;
+    this.candidatePlaylists = [];
+    this.addLoading = true;
+    this.addSheetShown = true;
+    try {
+      const all = await source.getUserPlaylists(source.user?.id ?? 0);
+      this.candidatePlaylists = filterAddablePlaylists(all, source.user);
+    } catch (e) {
+      Logger.error(TAG, `加载用户歌单失败: ${e}`);
+    } finally {
+      this.addLoading = false;
+    }
+  }
+
+  private async handleSelectPlaylist(playlist: Playlist): Promise<void> {
+    if (!this.targetSource || !this.targetSong) {
+      return;
+    }
+    this.addSheetShown = false;
+    try {
+      await this.targetSource.addSongsToPlaylist(playlist.id, [this.targetSong.id]);
+      this.toast($r('app.string.toast_added_to_playlist'));
+    } catch (e) {
+      Logger.error(TAG, `添加到歌单失败: ${e}`);
+      this.toast($r('app.string.toast_operation_failed'));
+    }
+  }
+
+  private async handleCreateAndAdd(name: string): Promise<void> {
+    if (!this.targetSource || !this.targetSong) {
+      return;
+    }
+    try {
+      const created = await this.targetSource.createPlaylist(name);
+      await this.targetSource.addSongsToPlaylist(created.id, [this.targetSong.id]);
+      this.addSheetShown = false;
+      this.toast($r('app.string.toast_added_to_playlist'));
+    } catch (e) {
+      Logger.error(TAG, `新建歌单并添加失败: ${e}`);
+      this.toast($r('app.string.toast_operation_failed'));
+    }
+  }
+
+  /** 从当前歌单移除该歌曲，并刷新详情 */
+  private async removeSongFromPlaylist(song: Song): Promise<void> {
+    const source = this.viewModel.sources.find((s: Source) => s.id === this.playlist.sourceId);
+    if (!source) {
+      return;
+    }
+    try {
+      await source.removeSongsFromPlaylist(this.playlist.id, [song.id]);
+      this.toast($r('app.string.toast_removed_from_playlist'));
+      await this.loadPlaylistDetail();
+    } catch (e) {
+      Logger.error(TAG, `从歌单移除失败: ${e}`);
+      this.toast($r('app.string.toast_operation_failed'));
+    }
+  }
+
+  @Builder
+  buildAddToPlaylistSheet() {
+    PlaylistSelectorSheet({
+      playlists: this.candidatePlaylists,
+      isLoading: this.addLoading,
+      onSelect: (pl: Playlist) => this.handleSelectPlaylist(pl),
+      onCreateNew: (name: string) => this.handleCreateAndAdd(name),
+      onClose: () => {
+        this.addSheetShown = false;
+      }
+    })
   }
 
   /**
@@ -573,6 +711,14 @@ struct PlaylistDetail {
       }
       .width('100%')
       .height('100%')
+      .bindSheet($$this.addSheetShown, this.buildAddToPlaylistSheet(), {
+        height: SheetSize.MEDIUM,
+        showClose: false,
+        preferType: SheetType.CENTER,
+        onWillDismiss: () => {
+          this.addSheetShown = false;
+        }
+      })
     }
     .mode(NavDestinationMode.STANDARD)
     .hideTitleBar(true)

@@ -1,6 +1,158 @@
 {
   "string": [
     {
+      "name": "tab_setting_floating_status_bar",
+      "value": "Floating Tab Bar"
+    },
+    {
+      "name": "tab_setting_selected_bg_color",
+      "value": "Selected Background"
+    },
+    {
+      "name": "tab_setting_material_type",
+      "value": "Material Type"
+    },
+    {
+      "name": "tab_setting_material_level",
+      "value": "Material Level"
+    },
+    {
+      "name": "tab_material_none",
+      "value": "None"
+    },
+    {
+      "name": "tab_material_adaptive",
+      "value": "Adaptive"
+    },
+    {
+      "name": "tab_material_immersive",
+      "value": "Immersive"
+    },
+    {
+      "name": "tab_material_level_exquisite",
+      "value": "Exquisite"
+    },
+    {
+      "name": "tab_material_level_soft",
+      "value": "Soft"
+    },
+    {
+      "name": "tab_material_level_smooth",
+      "value": "Smooth"
+    },
+    {
+      "name": "playlist_add_to",
+      "value": "Add to Playlist"
+    },
+    {
+      "name": "playlist_create_new",
+      "value": "New Playlist"
+    },
+    {
+      "name": "playlist_name_hint",
+      "value": "Enter playlist name"
+    },
+    {
+      "name": "playlist_selector_empty",
+      "value": "No playlists yet — create one above"
+    },
+    {
+      "name": "playlist_remove_from",
+      "value": "Remove from Playlist"
+    },
+    {
+      "name": "toast_added_to_playlist",
+      "value": "Added to playlist"
+    },
+    {
+      "name": "toast_removed_from_playlist",
+      "value": "Removed from playlist"
+    },
+    {
+      "name": "toast_playlist_created",
+      "value": "Playlist created"
+    },
+    {
+      "name": "toast_operation_failed",
+      "value": "Operation failed, please retry"
+    },
+    {
+      "name": "common_create",
+      "value": "Create"
+    },
+    {
+      "name": "search_tab_songs",
+      "value": "Songs"
+    },
+    {
+      "name": "search_tab_playlists",
+      "value": "Playlists"
+    },
+    {
+      "name": "search_tab_artists",
+      "value": "Artists"
+    },
+    {
+      "name": "search_tab_albums",
+      "value": "Albums"
+    },
+    {
+      "name": "search_all_sources",
+      "value": "All Sources"
+    },
+    {
+      "name": "search_loading",
+      "value": "Searching…"
+    },
+    {
+      "name": "search_empty_result",
+      "value": "No results found"
+    },
+    {
+      "name": "search_empty_hint",
+      "value": "Type a keyword and press Enter"
+    },
+    {
+      "name": "search_empty_sub",
+      "value": "Search songs, playlists, artists and albums"
+    },
+    {
+      "name": "action_play_now",
+      "value": "Play Now"
+    },
+    {
+      "name": "action_add_next",
+      "value": "Play Next"
+    },
+    {
+      "name": "action_favorite",
+      "value": "Add to Favorites"
+    },
+    {
+      "name": "action_unfavorite",
+      "value": "Remove from Favorites"
+    },
+    {
+      "name": "toast_favorited",
+      "value": "Added to favorites"
+    },
+    {
+      "name": "toast_unfavorited",
+      "value": "Removed from favorites"
+    },
+    {
+      "name": "library_tab_playlists",
+      "value": "Playlists"
+    },
+    {
+      "name": "library_tab_albums",
+      "value": "Albums"
+    },
+    {
+      "name": "subscribed_albums_empty",
+      "value": "No favorite albums yet"
+    },
+    {
       "name": "module_desc",
       "value": "module description"
     },

@@ -22,6 +22,12 @@ export struct NowPlayingQueueSheet {
   /** 点击歌曲回调 */
   @Param onSongClick?: (song: Song, index: number) => void = undefined;
 
+  /** 添加到歌单回调（长按菜单触发） */
+  @Param onAddToPlaylist?: (song: Song) => void = undefined;
+
+  /** 收藏/喜欢回调（长按菜单触发） */
+  @Param onFavorite?: (song: Song) => void = undefined;
+
   /** 关闭面板回调 */
   @Param onClose?: () => void = undefined;
 
@@ -94,6 +100,28 @@ export struct NowPlayingQueueSheet {
     .padding(24)
   }
 
+  /** 队列项长按菜单：收藏 / 添加到歌单 */
+  @Builder
+  private buildSongMenu(song: Song) {
+    Menu() {
+      MenuItem({
+        startIcon: song.meta?.isFavorite ? $r('sys.symbol.heart_fill') : $r('sys.symbol.heart'),
+        content: song.meta?.isFavorite ? $r('app.string.action_unfavorite') : $r('app.string.action_favorite')
+      })
+        .onClick(() => {
+          if (this.onFavorite) {
+            this.onFavorite(song);
+          }
+        })
+      MenuItem({ startIcon: $r('sys.symbol.music_note_list'), content: $r('app.string.playlist_add_to') })
+        .onClick(() => {
+          if (this.onAddToPlaylist) {
+            this.onAddToPlaylist(song);
+          }
+        })
+    }
+  }
+
   @Builder
   private buildSongList() {
     List({ space: 4, scroller: this.listScroller }) {
@@ -115,6 +143,7 @@ export struct NowPlayingQueueSheet {
             })
           }
           .padding({ left: 4, right: 4 })
+          .bindContextMenu(this.buildSongMenu(song.item), ResponseType.LongPress)
         })
         .key((item: Song) => `queue-${item.sourceId}-${item.id}`)
     }

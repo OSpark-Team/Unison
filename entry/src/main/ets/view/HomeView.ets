@@ -21,6 +21,8 @@ import { emitter } from '@kit.BasicServicesKit';
 import { EmitEventConstants } from '../common/EmitEventConstants';
 import PlaylistViewModel from '../viewmodel/PlaylistViewModel';
 import TabSettingModel from '../model/adapter/TabSetting';
+import { PlaylistSelectorSheet } from '../components/PlaylistSelectorSheet';
+import { AddToPlaylistController, toggleSongFavorite } from '../utils/SongActions';
 
 
 @ComponentV2
@@ -56,6 +58,8 @@ export struct HomeView {
   @Local playlistViewModel: PlaylistViewModel =
     AppStorageV2.connect(PlaylistViewModel, 'PlaylistViewModel', () => new PlaylistViewModel())!;
   @Local TabSettingModel: TabSettingModel = PersistenceV2.connect(TabSettingModel, 'TabSettingModel', () => new TabSettingModel())!;
+  /** 「添加到歌单」控制器（统一长按菜单复用） */
+  @Local addCtrl: AddToPlaylistController = new AddToPlaylistController();
   /**
    * ForU 颜色枚举值
    */
@@ -116,6 +120,66 @@ export struct HomeView {
         this.playlistViewModel.playSong(song, true);
       }
     })
+      .bindContextMenu(this.buildSongMenu(song), ResponseType.LongPress)
+  }
+
+  /** 歌曲长按菜单（与搜索页一致：立即播放 / 下一首 / 收藏 / 添加到歌单） */
+  @Builder
+  buildSongMenu(song: Song) {
+    Menu() {
+      MenuItem({ startIcon: $r('sys.symbol.play_fill'), content: $r('app.string.action_play_now') })
+        .onClick(() => this.playSongNow(song))
+      MenuItem({ startIcon: $r('sys.symbol.plus'), content: $r('app.string.action_add_next') })
+        .onClick(() => this.addToPlayNext(song))
+      MenuItem({
+        startIcon: song.meta?.isFavorite ? $r('sys.symbol.heart_fill') : $r('sys.symbol.heart'),
+        content: song.meta?.isFavorite ? $r('app.string.action_unfavorite') : $r('app.string.action_favorite')
+      })
+        .onClick(() => this.favoriteSong(song))
+      MenuItem({ startIcon: $r('sys.symbol.music_note_list'), content: $r('app.string.playlist_add_to') })
+        .onClick(() => this.addCtrl.open(song, this.viewModel.sources))
+    }
+  }
+
+  /** 「添加到歌单」面板内容 */
+  @Builder
+  buildAddSheet() {
+    PlaylistSelectorSheet({
+      playlists: this.addCtrl.candidates,
+      isLoading: this.addCtrl.loading,
+      onSelect: (pl: Playlist) => {
+        this.addCtrl.select(pl).then((ok: boolean) => {
+          this.toast(ok ? $r('app.string.toast_added_to_playlist') : $r('app.string.toast_operation_failed'));
+        });
+      },
+      onCreateNew: (name: string) => {
+        this.addCtrl.createAndAdd(name).then((ok: boolean) => {
+          this.toast(ok ? $r('app.string.toast_added_to_playlist') : $r('app.string.toast_operation_failed'));
+        });
+      },
+      onClose: () => this.addCtrl.close()
+    })
+  }
+
+  private playSongNow(song: Song): void {
+    this.playlistViewModel.insertSongs([song], 0);
+    this.playlistViewModel.playSong(song, true);
+  }
+
+  private addToPlayNext(song: Song): void {
+    const nextIndex = Math.max(0, this.playlistViewModel.currentIndex + 1);
+    this.playlistViewModel.insertSongs([song], nextIndex);
+  }
+
+  private toast(msg: ResourceStr): void {
+    this.getUIContext().getPromptAction().showToast({ message: msg });
+  }
+
+  private async favoriteSong(song: Song): Promise<void> {
+    const r = await toggleSongFavorite(song, this.viewModel.sources);
+    if (r !== null) {
+      this.toast(r ? $r('app.string.toast_favorited') : $r('app.string.toast_unfavorited'));
+    }
   }
 
   @Builder
@@ -422,5 +486,11 @@ export struct HomeView {
     .scrollBar(BarState.Off)
     .height("100%")
     .width("100%")
+    .bindSheet($$this.addCtrl.shown, this.buildAddSheet(), {
+      height: SheetSize.MEDIUM,
+      showClose: false,
+      preferType: SheetType.CENTER,
+      onWillDismiss: () => this.addCtrl.close()
+    })
   }
 }
